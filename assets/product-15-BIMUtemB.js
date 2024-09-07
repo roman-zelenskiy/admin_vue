@@ -1,1 +1,0 @@
-const s="/assets/img/product/product-11.jpg",t="/assets/img/product/product-12.jpg",o="/assets/img/product/product-13.jpg",p="/assets/img/product/product-14.jpg",c="/assets/img/product/product-15.jpg";export{s as _,t as a,o as b,p as c,c as d};
