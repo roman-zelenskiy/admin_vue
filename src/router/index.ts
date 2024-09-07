@@ -6,7 +6,7 @@ const router = createRouter({
   routes: [
     {
       name: "Auth",
-      meta: { requiresNotAuth: true },
+      // meta: { requiresNotAuth: true },
       path: "/",
       component: () => import("../pages/Auth.vue"),
     },
@@ -14,7 +14,7 @@ const router = createRouter({
     {
       name: "MainPage",
       path: "/main",
-      meta: { requiresAuth: true },
+      // meta: { requiresAuth: true },
       redirect: { path: "/dashboard" },
       component: () => import("../components/layouts/Main.vue"),
       children: [
