@@ -1,14 +1,10 @@
 name: Build and Deploy
-
 on:
   push:
     branches:
       - main
-
 permissions:
   contents: write
-  pages: write
-
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
@@ -16,7 +12,6 @@ jobs:
     strategy:
       matrix:
         node-version: [18]
-
     steps:
     - name: Checkout 🛎️
       uses: actions/checkout@v3
@@ -26,10 +21,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install dependencies & Build 🔧
+    - name: Install & Generate 🔧
       run: |
         npm ci
-        npm run build
+        npm run generate
       env:
         VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
         VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
@@ -39,3 +34,8 @@ jobs:
         VITE_FIREBVITE_FIREBASE_STORAGE_BUCKETASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBVITE_FIREBASE_STORAGE_BUCKETASE_MESSAGING_SENDER_ID }}
         VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
         VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: dist
