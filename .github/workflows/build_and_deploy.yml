@@ -24,7 +24,7 @@ jobs:
     - name: Install & Generate 🔧
       run: |
         npm ci
-        npm run generate
+        npm run build 
       env:
         VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
         VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
