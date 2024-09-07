@@ -8,29 +8,6 @@ const router = useRouter();
 const auth = useAuthStore();
 const appOption = useAppOptionStore();
 
-const notificationData = [
-  {
-    icon: "fa fa-receipt fa-lg fa-fw text-success",
-    title: "Your store has a new order for 2 items totaling $1,299.00",
-    time: "just now",
-  },
-  {
-    icon: "far fa-user-circle fa-lg fa-fw text-body text-opacity-25",
-    title: "3 new customer account is created",
-    time: "2 minutes ago",
-  },
-  {
-    img: "/assets/img/icon/android.svg",
-    title: "Your android application has been approved",
-    time: "5 minutes ago",
-  },
-  {
-    img: "/assets/img/icon/paypal.svg",
-    title: "Paypal payment method has been enabled for your store",
-    time: "10 minutes ago",
-  },
-];
-
 function logout() {
   auth.logout().then(() => {
     router.push({ name: "Auth" });
