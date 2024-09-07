@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { getCurrentUser } from "vuefire";
+// import { getCurrentUser } from "vuefire";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       name: "Auth",
+      // meta: { requiresNotAuth: true },
       path: "/",
       component: () => import("../pages/Auth.vue"),
     },
@@ -13,6 +14,7 @@ const router = createRouter({
     {
       name: "MainPage",
       path: "/main",
+      // meta: { requiresAuth: true },
       redirect: { path: "/dashboard" },
       component: () => import("../components/layouts/Main.vue"),
       children: [
