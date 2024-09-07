@@ -300,7 +300,7 @@ const tagsAutocomplete = ref([
           </card-header>
           <card-body>
             <div class="row">
-              <div class="col-lg-8 w-100 overflow-auto">
+              <div class="col-lg-8  overflow-auto">
                 <table class="table table-hover text-nowrap">
                   <thead>
                     <tr>
