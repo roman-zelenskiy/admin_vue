@@ -6,7 +6,6 @@ const router = createRouter({
   routes: [
     {
       name: "Auth",
-      // meta: { requiresNotAuth: true },
       path: "/",
       component: () => import("../pages/Auth.vue"),
     },
@@ -14,7 +13,6 @@ const router = createRouter({
     {
       name: "MainPage",
       path: "/main",
-      // meta: { requiresAuth: true },
       redirect: { path: "/dashboard" },
       component: () => import("../components/layouts/Main.vue"),
       children: [
@@ -232,28 +230,28 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach(async (to) => {
-  if (to.meta.requiresAuth) {
-    const currentUser = await getCurrentUser();
+// router.beforeEach(async (to) => {
+//   if (to.meta.requiresAuth) {
+//     const currentUser = await getCurrentUser();
 
-    if (!currentUser) {
-      return {
-        name: "Auth",
-      };
-    }
-  }
-});
+//     if (!currentUser) {
+//       return {
+//         name: "Auth",
+//       };
+//     }
+//   }
+// });
 
-router.beforeEach(async (to) => {
-  if (to.meta.requiresNotAuth) {
-    const currentUser = await getCurrentUser();
+// router.beforeEach(async (to) => {
+//   if (to.meta.requiresNotAuth) {
+//     const currentUser = await getCurrentUser();
 
-    if (currentUser) {
-      return {
-        name: "MainPage",
-      };
-    }
-  }
-});
+//     if (currentUser) {
+//       return {
+//         name: "MainPage",
+//       };
+//     }
+//   }
+// });
 
 export default router;
