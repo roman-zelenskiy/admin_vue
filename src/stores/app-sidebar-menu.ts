@@ -18,6 +18,11 @@ export const useAppSidebarMenuStore = defineStore({
         icon: "fa fa-user",
         text: "Customers",
       },
+      {
+        url: "/categories",
+        icon: "fa fa-list",
+        text: "Categories",
+      },
       // {
       //   url: "/analytics",
       //   icon: "fa fa-chart-pie",

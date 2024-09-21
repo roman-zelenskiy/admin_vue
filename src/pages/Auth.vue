@@ -19,7 +19,6 @@ const login = () => {
     .then((user) => {
       error.value = "";
       router.push({ name: "MainPage" });
-      console.log(user);
     })
     .catch((err) => {
       error.value = err;

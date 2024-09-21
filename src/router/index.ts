@@ -6,7 +6,7 @@ const router = createRouter({
   routes: [
     {
       name: "Auth",
-      // meta: { requiresNotAuth: true },
+      meta: { requiresNotAuth: true },
       path: "/",
       component: () => import("../pages/Auth.vue"),
     },
@@ -14,7 +14,7 @@ const router = createRouter({
     {
       name: "MainPage",
       path: "/main",
-      // meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
       redirect: { path: "/dashboard" },
       component: () => import("../components/layouts/Main.vue"),
       children: [
@@ -27,8 +27,20 @@ const router = createRouter({
           component: () => import("../pages/customers/Customers.vue"),
         },
         {
+          path: "/categories",
+          component: () => import("../pages/categories/CategoriesList.vue"),
+        },
+        {
           path: "/customer-create",
           component: () => import("../pages/customers/CreateCustomer.vue"),
+        },
+        {
+          path: "/category-create",
+          component: () => import("../pages/categories/CreateCategory.vue"),
+        },
+        {
+          path: "/category-update/:categoryId",
+          component: () => import("../pages/categories/UpdateCategory.vue"),
         },
         {
           path: "/analytics",

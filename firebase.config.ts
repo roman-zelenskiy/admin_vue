@@ -1,5 +1,11 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getFirestore, collection } from "firebase/firestore";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 
 const {
   VITE_FIREBASE_API_KEY,
@@ -23,4 +29,27 @@ export const firebaseApp = initializeApp({
   measurementId: VITE_FIREBASE_MEASUREMENT_ID,
 });
 
-const analytics = getAnalytics(firebaseApp);
+export const db = getFirestore(firebaseApp);
+
+export const categoriesCollection = collection(db, "user-categories");
+export const usersCollection = collection(db, "customers");
+
+export const storage = getStorage(firebaseApp);
+
+export const uploadImage = (file: File, path: string) => {
+  return new Promise((resolve, reject) => {
+    const storagePath = `${path}/${file.name}`;
+
+    const storageReference = storageRef(storage, storagePath);
+
+    uploadBytes(storageReference, file)
+      .then(async (snapshot) => {
+        console.log("Upload successful!");
+        const downloadURL: string = await getDownloadURL(snapshot.ref);
+        resolve(downloadURL);
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+};

@@ -1,4 +1,5 @@
 declare interface Customer {
+  id: string;
   name: string;
   surname: string;
   aboutUser: string;
@@ -17,13 +18,13 @@ declare interface Customer {
     | "Receptionist"
     | "Team leader";
 
+  categoryId?: string;
   category?: string;
   country: string;
   state: string;
   city: string;
   address: string;
   language: string;
-
   partners: number;
   listings: number;
   availableSlots?: number;
@@ -32,32 +33,28 @@ declare interface Customer {
   buyers?: number;
   sellers?: number;
   followers?: number;
-  photo?: string;
+  photo?: string | null;
   phone: {
     type: string;
-    number: string;
+    value: string;
   }[];
   email: {
     type: string;
-    page: string;
+    value: string;
   }[];
   websiteSocial: {
-    page: string;
     type: string;
+    value: string;
   }[];
 
   experience: {
+    id: string;
     logo: string;
     company: string;
     position: string;
     country?: string;
     city?: string;
-    employmentType?:
-      | "Full time"
-      | "Part time"
-      | "Self-employed"
-      | "Freelancer"
-      | "Intership";
+    employmentType?: EmploymentTypeOptions | "";
     start: string;
     end: string;
     comment: string;
@@ -84,14 +81,39 @@ declare interface Customer {
   notificationShowActivityOnTheMarketByTypeInDifferentCities: string;
   notificationShowPriceAnalysisByTypeInDifferentCities: string;
   notificationSubscriptionExpireDays: number;
-  billingMethod: "E-Invoice" | "Paper invoice";
-  billingFor: "Membership" | "Subscription" | "Per listing" | "Per lead";
+  billingMethod: "" | "E-Invoice" | "Paper invoice";
+  billingFor?:
+    | null
+    | "Membership"
+    | "Subscription"
+    | "Per listing"
+    | "Per lead";
   billingCountry: string;
   billingState: string;
   billingAddress: string;
   postalCode: string;
-  methodOfPayment: "Bank account" | "Card";
-  cyclePayment: "At the begging" | "At the end";
+  methodOfPayment: "Bank account" | "Card" | "";
+  cyclePayment: "" | "At the begging" | "At the end";
   company: string;
-  subscriptions?: "Premium" | "Fremium";
+  yearCompanyFoundation: number;
+  subscriptions?: "Premium" | "Fremium" | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+declare interface CreateCustomer extends Omit<Customer, "id"> {
+  photo: string | File | null;
+  yearCompanyFoundation: number | null;
+  experience: {
+    id: string;
+    logo: string | File;
+    company: string;
+    position: string;
+    country?: string;
+    city?: string;
+    employmentType?: EmploymentTypeOptions | "";
+    start: string;
+    end: string;
+    comment: string;
+  }[];
 }

@@ -1,16 +1,7 @@
-<script>
-import Datepicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css';
-
-export default {
-	components: { Datepicker },
-		data() {
-		return {
-			date: null,
-		};
-	}
-}
+<script setup lang="ts">
+import Datepicker from "@vuepic/vue-datepicker";
+import "@vuepic/vue-datepicker/dist/main.css";
 </script>
 <template>
-  <Datepicker v-model="date" placeholder="Select date..." dark></Datepicker>
+  <Datepicker placeholder="Select date..." dark></Datepicker>
 </template>
