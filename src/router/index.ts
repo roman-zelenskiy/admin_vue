@@ -35,6 +35,10 @@ const router = createRouter({
           component: () => import("../pages/customers/CreateCustomer.vue"),
         },
         {
+          path: "/customer-update/:id",
+          component: () => import("../pages/customers/UpdateCustomer.vue"),
+        },
+        {
           path: "/category-create",
           component: () => import("../pages/categories/CreateCategory.vue"),
         },

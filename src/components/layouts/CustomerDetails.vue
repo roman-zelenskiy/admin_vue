@@ -12,10 +12,16 @@ import { useCategoriesStore } from "@/stores/categories.ts";
 import { useAppConstantsStore } from "@/stores/app-constants.ts";
 import { useCustomersStore } from "@/stores/customers.ts";
 
-type Props = {
-  payloadInputs: CreateCustomer;
-  type: "Create" | "Update";
-};
+type Props =
+  | {
+      type: "Create";
+      payloadInputs: CreateCustomer;
+    }
+  | {
+      type: "Update";
+      payloadInputs: CreateCustomer;
+      customerId: Customer["id"];
+    };
 
 const props = defineProps<Props>();
 
@@ -81,7 +87,7 @@ watch(
       previewImage(el.logo, index);
     });
   },
-  { deep: true }
+  { deep: true },
 );
 
 const showExperience = computed(() => {
@@ -128,13 +134,13 @@ const actionPage = async () => {
     response = await customersStore.createCustomer(i);
   }
 
-  // if (props.type === "Update") {
-  //   inputs.value.updatedAt = new Date().toDateString;
-  //   response = await categoriesStore.updateCategory(
-  //     inputs.value,
-  //     props.categoryId
-  //   );
-  // }
+  if (props.type === "Update") {
+    inputs.value.updatedAt = new Date().toDateString();
+    response = await customersStore.updateCustomer(
+      inputs.value,
+      props.customerId,
+    );
+  }
 
   if (response.status === 0) {
     error.value = "The action is unsuccessful!";
@@ -170,7 +176,7 @@ const actionExperience = async () => {
 
 const removeExperience = (id: string) => {
   inputs.value.experience = inputs.value.experience.filter(
-    (el) => el.id !== id
+    (el) => el.id !== id,
   );
 };
 
@@ -189,7 +195,7 @@ const addSocial = (type: "email" | "phone" | "websiteSocial") => {
 };
 const removeSocial = (
   type: "email" | "phone" | "websiteSocial",
-  index: number
+  index: number,
 ) => {
   inputs.value[type] = inputs.value[type].filter((el, ind) => ind !== index);
 };

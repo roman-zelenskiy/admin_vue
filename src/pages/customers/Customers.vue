@@ -19,7 +19,11 @@ const currentCategoryId = ref<string>("");
 const isModalDelete = ref(false);
 const { categories } = categoriesStore.getAllCategories();
 
-const filters: { value: CategoryFilters; title: string }[] = [
+const getCategoryById = (id: string) => {
+  return categories.value.find((el) => el.id === id);
+};
+
+const filters: { value: CustomersFilters; title: string }[] = [
   {
     value: "id",
     title: "Id",
@@ -44,7 +48,7 @@ const switchModalDelete = (value: boolean, id: string) => {
   isModalDelete.value = value;
 };
 
-const changeFilter = (filterKey: CategoryFilters) => {
+const changeFilter = (filterKey: CustomersFilters) => {
   currentFilter.value = filterKey;
 };
 
@@ -58,10 +62,10 @@ const getDocuments = async () => {
   totalPages.value = total;
 };
 
-const deleteCategory = async (categoryId: Category["id"]) => {
-  // await customersStore.deleteCategory(categoryId);
-  // await getDocuments();
-  // switchModalDelete(false, "");
+const deleteCategory = async (documentId: Customer["id"]) => {
+  await customersStore.deleteDocument(documentId);
+  await getDocuments();
+  switchModalDelete(false, "");
 };
 
 watch(
@@ -80,7 +84,7 @@ getDocuments();
     <ModalConfirmation
       @actionSuccess="deleteCategory(currentCategoryId)"
       v-model="isModalDelete"
-      :title="'Delete a category?'"
+      :title="'Delete a customer?'"
     ></ModalConfirmation>
     <!-- <button @">load more</button> -->
     <div>
@@ -192,15 +196,16 @@ getDocuments();
                 <td class="align-middle">{{ customer?.id }}</td>
                 <td class="align-middle">
                   <div class="ms-3">
-                    <RouterLink to="/"
+                    <RouterLink :to="/customer-update/ + customer?.id"
                       >{{ customer?.name }} {{ customer?.surname }}</RouterLink
                     >
                   </div>
                 </td>
                 <td class="align-middle">
                   {{
-                    categories.find((el) => el.id === customer.categoryId)
-                      ?.title || "-"
+                    customer.categoryId
+                      ? getCategoryById(customer.categoryId)?.title || "-"
+                      : "-"
                   }}
                 </td>
                 <td class="align-middle">{{ customer?.ref }}</td>
@@ -209,29 +214,15 @@ getDocuments();
                 <td class="align-middle">
                   {{ formatDate(customer?.createdAt) }}
                 </td>
-              </tr>
-              <!-- <tr v-for="category in customers" :key="category.id">
-                <td class="align-middle">{{ category.id }}</td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div>
-                      <RouterLink :to="/category-update/ + category.id">{{
-                        category.title
-                      }}</RouterLink>
-                    </div>
-                  </div>
-                </td>
-                <td class="align-middle">{{ category.createdAt }}</td>
-                <td class="align-middle">{{ category.updatedAt }}</td>
                 <td class="align-middle">
                   <button
-                    @click="switchModalDelete(true, category.id)"
+                    @click="switchModalDelete(true, customer.id)"
                     class="btn btn-light"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </td>
-              </tr> -->
+              </tr>
             </tbody>
           </table>
         </div>

@@ -5,6 +5,8 @@ import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL,
+  deleteObject,
+  ref,
 } from "firebase/storage";
 
 const {
@@ -52,4 +54,9 @@ export const uploadImage = (file: File, path: string) => {
         reject(error);
       });
   });
+};
+
+export const deleteFileFromStorage = async (filePath: string) => {
+  const storageRef = ref(storage, filePath);
+  await deleteObject(storageRef);
 };

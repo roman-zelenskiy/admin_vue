@@ -117,3 +117,7 @@ declare interface CreateCustomer extends Omit<Customer, "id"> {
     comment: string;
   }[];
 }
+
+
+
+declare type CustomersFilters = "id" | "title" | "createdAt" | "";
