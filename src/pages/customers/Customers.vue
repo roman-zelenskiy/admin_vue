@@ -208,8 +208,8 @@ getDocuments();
                       : "null"
                   }}
                 </td>
-                <td class="align-middle">{{ customer?.ref }}</td>
-                <td class="align-middle">{{ customer?.company }}</td>
+                <td class="align-middle">{{ customer?.ref || "null" }}</td>
+                <td class="align-middle">{{ customer?.company || "null" }}</td>
                 <td class="align-middle">{{ customer?.country }}</td>
                 <td class="align-middle">
                   {{ customer?.createdAt }}
