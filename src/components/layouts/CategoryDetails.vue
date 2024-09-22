@@ -39,8 +39,8 @@ const actionPage = async () => {
 
   if (props.type === "Create") {
     const i: CreateCategory = inputs.value as CreateCategory;
-    i.createdAt = formatDate(new Date());
-    i.updatedAt = formatDate(new Date());
+    i.createdAt = new Date().toISOString();
+    i.updatedAt = new Date().toISOString();
     response = await categoriesStore.createCategory(i);
   }
 

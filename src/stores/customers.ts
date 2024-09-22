@@ -71,6 +71,8 @@ export const useCustomersStore = defineStore("customers", () => {
         currentPagePayload,
         filter
       );
+      console.log(documents);
+
       return { documents: documents, totalPages };
     } catch (error) {
       console.error("Error fetching documents: ", error);

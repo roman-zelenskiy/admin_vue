@@ -24,6 +24,11 @@ export const useAppSidebarMenuStore = defineStore({
         text: "Categories",
       },
       // {
+      //   url: "/real_estate",
+      //   icon: "fa fa-home",
+      //   text: "Real estate",
+      // },
+      // {
       //   url: "/analytics",
       //   icon: "fa fa-chart-pie",
       //   text: "Analytics",

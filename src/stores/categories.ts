@@ -61,6 +61,8 @@ export const useCategoriesStore = defineStore("categories", () => {
         currentPagePayload,
         filter
       );
+      // console.log(documents.length);
+
       return { categories: documents, totalPages };
     } catch (error) {
       console.error("Error fetching documents: ", error);

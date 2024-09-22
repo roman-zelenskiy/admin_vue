@@ -29,8 +29,8 @@ const filters: { value: CustomersFilters; title: string }[] = [
     title: "Id",
   },
   {
-    value: "name",
-    title: "Name",
+    value: "title",
+    title: "Title",
   },
   {
     value: "createdAt",
@@ -90,16 +90,16 @@ getDocuments();
     <div>
       <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">PAGES</a></li>
-        <li class="breadcrumb-item active text-uppercase">Customers</li>
+        <li class="breadcrumb-item active text-uppercase">Real estate</li>
       </ul>
-      <h1 class="page-header mb-0">Customers</h1>
+      <h1 class="page-header mb-0">Real estate</h1>
       <!-- {{ totalPages }} -->
     </div>
 
     <div class="ms-auto">
-      <RouterLink to="/customer-create" href="#" class="btn btn-theme"
+      <RouterLink to="/real-estate-create" href="#" class="btn btn-theme"
         ><i class="fa fa-plus-circle fa-fw me-1"></i> Create
-        Customer</RouterLink
+        Real estate</RouterLink
       >
     </div>
   </div>
@@ -158,11 +158,11 @@ getDocuments();
               <tr>
                 <th class="pt-0 pb-2"></th>
                 <th class="pt-0 pb-2">Id</th>
-                <th class="pt-0 pb-2">Name</th>
+                <th class="pt-0 pb-2">Title</th>
                 <th class="pt-0 pb-2">Category</th>
                 <th class="pt-0 pb-2">REF</th>
                 <th class="pt-0 pb-2">Company</th>
-                <th class="pt-0 pb-2">Country</th>
+                <th class="pt-0 pb-2">Language</th>
                 <th class="pt-0 pb-2">Created At</th>
                 <th class="pt-0 pb-2"></th>
               </tr>
@@ -195,7 +195,7 @@ getDocuments();
                 </td>
                 <td class="align-middle">{{ customer?.id }}</td>
                 <td class="align-middle">
-                  <div class="ms-3 text-truncate" style="max-width: 300px">
+                  <div class="ms-3">
                     <RouterLink :to="/customer-update/ + customer?.id"
                       >{{ customer?.name }} {{ customer?.surname }}</RouterLink
                     >
@@ -210,9 +210,9 @@ getDocuments();
                 </td>
                 <td class="align-middle">{{ customer?.ref }}</td>
                 <td class="align-middle">{{ customer?.company }}</td>
-                <td class="align-middle">{{ customer?.country }}</td>
+                <td class="align-middle">{{ customer?.language }}</td>
                 <td class="align-middle">
-                  {{ customer?.createdAt }}
+                  {{ formatDate(customer?.createdAt) }}
                 </td>
                 <td class="align-middle">
                   <button

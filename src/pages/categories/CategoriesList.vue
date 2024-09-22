@@ -166,8 +166,8 @@ getCategories();
                     </div>
                   </div>
                 </td>
-                <td class="align-middle">{{ category.createdAt }}</td>
-                <td class="align-middle">{{ category.updatedAt }}</td>
+                <td class="align-middle">{{ category?.createdAt }}</td>
+                <td class="align-middle">{{ category?.updatedAt }}</td>
                 <td class="align-middle">
                   <button
                     @click="switchModalDelete(true, category.id)"

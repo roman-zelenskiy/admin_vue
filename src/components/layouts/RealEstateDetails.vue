@@ -55,8 +55,8 @@ const previewExperience = ref<CreateCustomer["experience"][0]>({
 const changeDateExperience = computed({
   get: () => [previewExperience.value.start, previewExperience.value.end],
   set: (arrayDate: Date[] | null[]) => {
-    previewExperience.value.start = arrayDate[0]?.toISOString() || "";
-    previewExperience.value.end = arrayDate[1]?.toISOString() || "";
+    previewExperience.value.start = arrayDate[0]?.toDateString() || "";
+    previewExperience.value.end = arrayDate[1]?.toDateString() || "";
   },
 });
 
@@ -129,13 +129,13 @@ const actionPage = async () => {
 
   if (props.type === "Create") {
     const i: CreateCustomer = inputs.value as CreateCustomer;
-    i.createdAt = new Date().toISOString();
-    i.updatedAt = new Date().toISOString();
+    i.createdAt = new Date().toDateString();
+    i.updatedAt = new Date().toDateString();
     response = await customersStore.createCustomer(i);
   }
 
   if (props.type === "Update") {
-    inputs.value.updatedAt = new Date().toISOString();
+    inputs.value.updatedAt = new Date().toDateString();
     response = await customersStore.updateCustomer(
       inputs.value,
       props.customerId,
