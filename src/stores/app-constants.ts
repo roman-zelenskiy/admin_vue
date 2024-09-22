@@ -187,6 +187,18 @@ export const useAppConstantsStore = defineStore("constants", () => {
     "No",
   ];
 
+  const stage: RealEstate["stage"][] = [
+    "Off plan",
+    "Under construction",
+    "Key ready",
+  ];
+
+  const saleStatus: RealEstate["saleStatus"][] = [
+    "Active listing",
+    "In draft listing",
+    "Banned listing",
+  ];
+
   return {
     visibilityOptions,
     typeAccountOptions,
@@ -218,5 +230,7 @@ export const useAppConstantsStore = defineStore("constants", () => {
     statusFirst,
     statusSecond,
     statusThird,
+    stage,
+    saleStatus,
   };
 });

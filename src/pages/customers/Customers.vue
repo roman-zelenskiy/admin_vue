@@ -204,8 +204,8 @@ getDocuments();
                 <td class="align-middle">
                   {{
                     customer.categoryId
-                      ? getCategoryById(customer.categoryId)?.title || "-"
-                      : "-"
+                      ? getCategoryById(customer.categoryId)?.title || "null"
+                      : "null"
                   }}
                 </td>
                 <td class="align-middle">{{ customer?.ref }}</td>

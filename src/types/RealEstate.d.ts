@@ -93,14 +93,16 @@ declare interface RealEstate {
   numberParkings: number;
   numberBlocks: number;
   deliveryData: string;
-
-  stage: string;
-  saleStatus: string;
-
+  stage: "Off plan" | "Under construction" | "Key ready";
+  saleStatus: "Active listing" | "In draft listing" | "Banned listing";
   priceFrom: number;
   priceTo: number;
   rentalPrice: number;
   priceCondition: number;
+
+  availableList: {
+    
+  }[]
 }
 
 declare interface CreateRealEstate extends Omit<RealEstate, "id"> {}
