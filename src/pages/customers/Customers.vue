@@ -210,7 +210,7 @@ getDocuments();
                 </td>
                 <td class="align-middle">{{ customer?.ref || "null" }}</td>
                 <td class="align-middle">{{ customer?.company || "null" }}</td>
-                <td class="align-middle">{{ customer?.country }}</td>
+                <td class="align-middle">{{ customer?.country || "null" }}</td>
                 <td class="align-middle">
                   {{ customer?.createdAt }}
                 </td>

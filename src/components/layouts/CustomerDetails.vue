@@ -32,7 +32,10 @@ const appConstantsStore = useAppConstantsStore();
 const emits = defineEmits(["update:modelValue"]);
 
 const visibilityOptions = appConstantsStore.visibilityOptions;
-const countries = computed(() => countriesStore.countriesList);
+const countries = computed(() => [
+  "Multinational",
+  ...countriesStore.countriesList,
+]);
 const languages = computed(() => countriesStore.languagesList);
 const { categories } = categoriesStore.getAllCategories();
 
@@ -87,7 +90,7 @@ watch(
       previewImage(el.logo, index);
     });
   },
-  { deep: true },
+  { deep: true }
 );
 
 const showExperience = computed(() => {
@@ -138,7 +141,7 @@ const actionPage = async () => {
     inputs.value.updatedAt = new Date().toISOString();
     response = await customersStore.updateCustomer(
       inputs.value,
-      props.customerId,
+      props.customerId
     );
   }
 
@@ -176,7 +179,7 @@ const actionExperience = async () => {
 
 const removeExperience = (id: string) => {
   inputs.value.experience = inputs.value.experience.filter(
-    (el) => el.id !== id,
+    (el) => el.id !== id
   );
 };
 
@@ -195,7 +198,7 @@ const addSocial = (type: "email" | "phone" | "websiteSocial") => {
 };
 const removeSocial = (
   type: "email" | "phone" | "websiteSocial",
-  index: number,
+  index: number
 ) => {
   inputs.value[type] = inputs.value[type].filter((el, ind) => ind !== index);
 };
