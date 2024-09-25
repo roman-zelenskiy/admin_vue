@@ -1,29 +1,28 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { useRealEstateStore } from "@/stores/realEstate.ts";
+import { useFeaturesStore } from "@/stores/features";
 
 import Pagination from "@/components/ui/Pagination.vue";
 import ModalConfirmation from "@/components/ui/ModalConfirmation.vue";
-import { formatDate } from "@/utils";
 
-const realEstateStore = useRealEstateStore();
+const featuresStore = useFeaturesStore();
 
 const page = ref(1);
 const searchValue = ref("");
-const currentFilter = ref<RealEstateFilters>("");
+const currentFilter = ref<CategoryFilters>("");
 const totalPages = ref(0);
-const docs = ref<RealEstate[]>([]);
+const documents = ref<Feature[]>([]);
 const currentCategoryId = ref<string>("");
 const isModalDelete = ref(false);
 
-const filters: { value: RealEstateFilters; title: string }[] = [
+const filters: { value: CategoryFilters; title: string }[] = [
   {
     value: "id",
     title: "Id",
   },
   {
-    value: "address",
-    title: "Address",
+    value: "title",
+    title: "Title",
   },
   {
     value: "createdAt",
@@ -41,35 +40,35 @@ const switchModalDelete = (value: boolean, id: string) => {
   isModalDelete.value = value;
 };
 
-const changeFilter = (filterKey: RealEstateFilters) => {
+const changeFilter = (filterKey: CategoryFilters) => {
   currentFilter.value = filterKey;
 };
 
-const getDocuments = async () => {
-  const { documents, totalPages: total } =
-    await realEstateStore.getItemsByFilters(page.value, {
+const getCategories = async () => {
+  const { documents: list, totalPages: total } =
+    await featuresStore.getDocsByFilters(page.value, {
       filterValue: searchValue.value,
       filterKey: currentFilter.value,
     });
-  docs.value = documents || [];
+  documents.value = list || [];
   totalPages.value = total;
 };
 
-const deleteCategory = async (documentId: Customer["id"]) => {
-  // await realEstateStore.deleteDocument(documentId);
-  // await getDocuments();
-  // switchModalDelete(false, "");
+const deleteCategory = async (categoryId: Category["id"]) => {
+  await featuresStore.deleteDocument(categoryId);
+  await getCategories();
+  switchModalDelete(false, "");
 };
 
 watch(
   [page, searchValue],
   () => {
-    getDocuments();
+    getCategories();
   },
   { deep: true }
 );
 
-getDocuments();
+getCategories();
 </script>
 
 <template>
@@ -77,22 +76,21 @@ getDocuments();
     <ModalConfirmation
       @actionSuccess="deleteCategory(currentCategoryId)"
       v-model="isModalDelete"
-      :title="'Delete a customer?'"
+      :title="'Delete a category?'"
     ></ModalConfirmation>
     <!-- <button @">load more</button> -->
     <div>
       <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">PAGES</a></li>
-        <li class="breadcrumb-item active text-uppercase">Real estate</li>
+        <li class="breadcrumb-item active text-uppercase">Features</li>
       </ul>
-      <h1 class="page-header mb-0">Real estate</h1>
+      <h1 class="page-header mb-0">Features</h1>
       <!-- {{ totalPages }} -->
     </div>
 
     <div class="ms-auto">
-      <RouterLink to="/real-estate-create" href="#" class="btn btn-theme"
-        ><i class="fa fa-plus-circle fa-fw me-1"></i> Create Real
-        estate</RouterLink
+      <RouterLink to="/feature-create" href="#" class="btn btn-theme"
+        ><i class="fa fa-plus-circle fa-fw me-1"></i> Add Feature</RouterLink
       >
     </div>
   </div>
@@ -111,7 +109,7 @@ getDocuments();
           >
             {{
               filters.find((el) => currentFilter == el.value)?.title ||
-              "Filter real estate"
+              "Filter categories"
             }}
             &nbsp;
           </button>
@@ -149,51 +147,35 @@ getDocuments();
           <table class="table table-hover text-nowrap">
             <thead>
               <tr>
-                <th class="pt-0 pb-2"></th>
                 <th class="pt-0 pb-2">Id</th>
                 <th class="pt-0 pb-2">Title</th>
-                <th class="pt-0 pb-2">Category</th>
-                <th class="pt-0 pb-2">REF</th>
-                <th class="pt-0 pb-2">Company</th>
-                <th class="pt-0 pb-2">Language</th>
                 <th class="pt-0 pb-2">Created At</th>
+                <th class="pt-0 pb-2">Updated At</th>
                 <th class="pt-0 pb-2"></th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(realEstate, index) in docs"
-                :key="realEstate.id || index"
-              >
-                <td class="align-middle">{{ realEstate?.id }}</td>
-                <!-- <td class="align-middle">
-                  <div class="ms-3">
-                    <RouterLink :to="/customer-update/ + customer?.id"
-                      >{{ customer?.name }} {{ customer?.surname }}</RouterLink
-                    >
+              <tr v-for="category in documents" :key="category.id">
+                <td class="align-middle">{{ category.id }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div>
+                      <RouterLink :to="/feature-update/ + category.id">{{
+                        category.title
+                      }}</RouterLink>
+                    </div>
                   </div>
                 </td>
-                <td class="align-middle">
-                  {{
-                    customer.categoryId
-                      ? getCategoryById(customer.categoryId)?.title || "-"
-                      : "-"
-                  }}
-                </td>
-                <td class="align-middle">{{ customer?.ref }}</td>
-                <td class="align-middle">{{ customer?.company }}</td>
-                <td class="align-middle">{{ customer?.language }}</td>
-                <td class="align-middle">
-                  {{ formatDate(customer?.createdAt) }}
-                </td>
+                <td class="align-middle">{{ category?.createdAt }}</td>
+                <td class="align-middle">{{ category?.updatedAt }}</td>
                 <td class="align-middle">
                   <button
-                    @click="switchModalDelete(true, customer.id)"
+                    @click="switchModalDelete(true, category.id)"
                     class="btn btn-light"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
-                </td> -->
+                </td>
               </tr>
             </tbody>
           </table>
@@ -209,11 +191,3 @@ getDocuments();
     </div>
   </card>
 </template>
-
-<style>
-.icon {
-  width: 50%;
-  height: 40%;
-  fill: var(--bs-theme);
-}
-</style>

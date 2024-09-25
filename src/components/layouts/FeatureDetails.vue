@@ -1,28 +1,26 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import QuillEditor from "@/components/plugins/QuillEditor.vue";
-import { useCategoriesStore } from "@/stores/categories";
-import { formatDate } from "@/utils";
+import tagsInput from "@/components/plugins/TagsInput.vue";
+import { useFeaturesStore } from "@/stores/features";
 
 type Props =
   | {
       type: "Create";
-      payloadInputs: CreateCategory;
+      payloadInputs: FeatureCreate;
     }
   | {
       type: "Update";
-      payloadInputs: UpdateCategory;
-      categoryId: string;
+      payloadInputs: FeatureUpdate;
+      featureId: string;
     };
 
 const props = defineProps<Props>();
 
 const emits = defineEmits(["update:modelValue"]);
-const categoriesStore = useCategoriesStore();
+const featuresStore = useFeaturesStore();
 
 const error = ref("");
 const message = ref("");
-const keyQuill = ref(1);
 
 const inputs = computed({
   get: () => props.payloadInputs,
@@ -31,24 +29,35 @@ const inputs = computed({
   },
 });
 
+const validation = () => {
+  if (inputs.value.properties.length === 0) {
+    error.value = "There must be a properties!";
+    return false;
+  }
+
+  return true;
+};
+
 const actionPage = async () => {
   error.value = "";
   message.value = "";
 
+  if (!validation()) return false;
+
   let response = { status: 0 };
 
   if (props.type === "Create") {
-    const i: CreateCategory = inputs.value as CreateCategory;
+    const i: FeatureCreate = inputs.value as FeatureCreate;
     i.createdAt = new Date().toISOString();
     i.updatedAt = new Date().toISOString();
-    response = await categoriesStore.createCategory(i);
+    response = await featuresStore.createDocument(i);
   }
 
   if (props.type === "Update") {
     inputs.value.updatedAt = new Date().toISOString();
-    response = await categoriesStore.updateCategory(
+    response = await featuresStore.updateDocument(
       inputs.value,
-      props.categoryId,
+      props.featureId
     );
   }
 
@@ -57,10 +66,11 @@ const actionPage = async () => {
   }
   if (response.status === 1) {
     message.value = "The action is successful!";
-    inputs.value.title = "";
-    inputs.value.description = "";
-    keyQuill.value++;
   }
+};
+
+const onChangeProperties = (newProperties: { text: string }[]) => {
+  inputs.value.properties = newProperties.map((el) => el.text);
 };
 </script>
 
@@ -70,10 +80,10 @@ const actionPage = async () => {
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:;">PAGES</a></li>
         <li class="breadcrumb-item text-uppercase active">
-          CATEGORY {{ type }}
+          Feature {{ type }}
         </li>
       </ol>
-      <h1 class="page-header mb-0">Category {{ type }}</h1>
+      <h1 class="page-header mb-0">Feature {{ type }}</h1>
     </div>
   </div>
 
@@ -84,7 +94,7 @@ const actionPage = async () => {
           <card-header
             class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
           >
-            Category Information
+            Feature Information
           </card-header>
           <card-body>
             <div class="mb-3">
@@ -100,21 +110,15 @@ const actionPage = async () => {
                 placeholder="Product name"
               />
             </div>
-            <div class="">
+            <div class="mb-3">
               <label class="form-label"
-                >Description <span class="text-danger"></span
-              ></label>
-              <div class="form-control p-0">
-                <div class="border-0">
-                  <quill-editor
-                    :key="keyQuill"
-                    :contentType="'html'"
-                    v-model:content="inputs.description"
-                    theme="snow"
-                    class="h-250px"
-                  />
-                </div>
-              </div>
+                >Properties <span class="text-danger">*</span></label
+              >
+              <tags-input
+                @tags-changed="onChangeProperties"
+                :tags="inputs.properties"
+                :autocomplete-items="[]"
+              />
             </div>
           </card-body>
         </card>

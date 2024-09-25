@@ -1,17 +1,22 @@
 declare interface RealEstate {
-  id: string;
-  address: string;
-  locationLat: string;
-  LocationIng: string;
-  street: string;
-  number: string;
-  floor: string;
-  door: string;
-  zipCode: string;
-  city: string;
-  reference: string;
-  market: "New building" | "Resale" | "Lands";
-  classification: "Residencial" | "Comercial" | "Agricultural" | "Parking";
+  id: string | null;
+  address: string | null;
+  locationLat: string | null;
+  locationIng: string | null;
+  street: string | null;
+  number: string | null;
+  floor: string | null;
+  door: string | null;
+  zipCode: string | null;
+  city: string | null;
+  reference: string | null;
+  market: "New building" | "Resale" | "Lands" | null;
+  classification:
+    | "Residential"
+    | "Commercial"
+    | "Agricultural"
+    | "Parking"
+    | null;
   typeOfProperty:
     | "House"
     | "Flat"
@@ -20,7 +25,8 @@ declare interface RealEstate {
     | "Industrial"
     | "Office"
     | "Building"
-    | "Parking";
+    | "Parking"
+    | null;
 
   category: Array<
     | "Single-family"
@@ -71,40 +77,96 @@ declare interface RealEstate {
     | "Garage"
     | "Storage"
     | "Parking space"
-  >;
+  > | null;
 
-  yearOfConstruction: number;
-  totalFloor: number;
-  residentialComplex: string;
-  sizePlot: number;
-  purposeLand: Array<"Urban" | "Development" | "Undeveloped">;
-  energy: "Connected" | "Disconted" | "Yes";
-  water: "Connected" | "Disconted" | "Debts";
-  gas: "Connected" | "Disconted" | "No";
+  yearOfConstruction: number | null;
+  totalFloor: number | null;
+  residentialComplex: string | null;
+  sizePlot: number | null;
+  purposeLand: Array<"Urban" | "Development" | "Undeveloped"> | null;
+  energy: "Connected" | "Disconnected" | "Yes" | null;
+  water: "Connected" | "Disconnected" | "Debts" | null;
+  gas: "Connected" | "Disconnected" | "No" | null;
   mobileCoverage:
     | "Full coverage"
     | "Stable coverage"
     | "Good coverage"
-    | "Bad coverage";
+    | "Bad coverage"
+    | null;
 
-  discountOrSpecialPromotion: string;
-  buildings: number;
-  apartaments: number;
-  numberParkings: number;
-  numberBlocks: number;
-  deliveryData: string;
-  stage: "Off plan" | "Under construction" | "Key ready";
-  saleStatus: "Active listing" | "In draft listing" | "Banned listing";
-  priceFrom: number;
-  priceTo: number;
-  rentalPrice: number;
-  priceCondition: number;
+  discountOrSpecialPromotion: string | null;
+  buildings: number | null;
+  apartments: number | null;
+  numberParkings: number | null;
+  numberBlocks: number | null;
+  deliveryDate: string | null;
+  stage: "Off plan" | "Under construction" | "Key ready" | null;
+  saleStatus: "Active listing" | "In draft listing" | "Banned listing" | null;
+  priceFrom: number | null;
+  priceTo: number | null;
+  rentalPrice: number | null;
+  priceCondition: number | null;
 
   availableList: {
-    
-  }[]
+    id: string;
+    totalFloor: number | null;
+    category: string | null;
+    bedroomsFrom: number | null;
+    bedroomsTo: number | null;
+    bathrooms: number | null;
+    squareFrom: number | null;
+    squareTo: number | null;
+    availableUnitsForSale: number | null;
+  }[];
+
+  developerDetails: {
+    companyDeveloper: string | null;
+    contactPerson: string | null;
+    phone: string | null;
+    addressCompany: string | null;
+    owner: string | null;
+  };
+
+  sold: "Furnished" | "Partly" | "Unfurnished" | null;
+
+  featuresIds: Feature["id"][] | null;
+  features: {
+    id: string;
+    properties: string[];
+  }[];
+
+  partnerCommission: number | null;
+  typeCommission: string | null;
+  hoaFees: number | null;
+  taxAmount: number | null;
+
+  listingAgreement: string | null;
+  showingRequirements: string | null;
+  listingTerms: string | null;
+  buyerIncentive: string | null;
+
+  description: string | null;
+  video: string | null;
+  virtualTour: string | null;
+  pictures: string[];
+  documentation: string[];
+
+  energyRatingConsumption: string | null;
+  energyRatingEmissions: string | null;
+
+  authorCompany: string | null;
+  userId: string | null;
+  user?: Customer | null;
+  date: string | null;
+  status: string | null;
+
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
-declare interface CreateRealEstate extends Omit<RealEstate, "id"> {}
+declare interface CreateRealEstate extends Omit<RealEstate, "id"> {
+  pictures: FileData[] | string[];
+  documentation: FileData[] | string[];
+}
 
-declare type RealEstateFilters = "id" | "title" | "createdAt" | "";
+declare type RealEstateFilters = "id" | "address" | "createdAt" | "";

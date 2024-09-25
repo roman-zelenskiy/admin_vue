@@ -9,13 +9,17 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  orderBy,
   QuerySnapshot,
   updateDoc,
   type DocumentData,
+  query
 } from "firebase/firestore";
 import { generateUniqueId } from "@/utils";
 import { getDocumentsByFilters } from "@/utils/getDocumentsByFilters";
-import { ref } from "vue";
+import { computed, ref } from "vue";
+import { useCollection } from "vuefire";
+
 
 export const useCustomersStore = defineStore("customers", () => {
   const documentsByFilters = ref<QuerySnapshot<
@@ -55,6 +59,21 @@ export const useCustomersStore = defineStore("customers", () => {
       console.log(error);
       return { status: 0 };
     }
+  };
+
+  const getAllDocuments = () => {
+    const q = query(usersCollection, orderBy("createdAt"));
+
+    const documents = useCollection(q);
+
+    const categoriesWithId = computed(() => {
+      return documents.value.map((doc) => ({
+        id: doc.id,
+        ...doc,
+      })) as Customer[];
+    });
+
+    return { documents: categoriesWithId };
   };
 
   const getCustomersByFilters = async (
@@ -159,5 +178,6 @@ export const useCustomersStore = defineStore("customers", () => {
     deleteDocument,
     getCustomerById,
     updateCustomer,
+    getAllDocuments,
   };
 });

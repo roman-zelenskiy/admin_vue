@@ -1,63 +1,63 @@
 <script setup lang="ts">
-import quillEditor from "@/components/plugins/QuillEditor.vue";
 import vueSelect from "@/components/plugins/VueSelect.vue";
-import InputImage from "@/components/ui/InputImage.vue";
 import datepicker from "@/components/plugins/Datepicker.vue";
+import quillEditor from "@/components/plugins/QuillEditor.vue";
+import InputFiles from "@/components/ui/InputFiles.vue";
 
-import { ref, computed, watch } from "vue";
-import { formatDate, generateUniqueId } from "@/utils";
+import { ref, computed } from "vue";
+import { generateUniqueId } from "@/utils";
 
-import { useCountriesStore } from "@/stores/countries.ts";
-import { useCategoriesStore } from "@/stores/categories.ts";
 import { useAppConstantsStore } from "@/stores/app-constants.ts";
+import { useFeaturesStore } from "@/stores/features";
 import { useCustomersStore } from "@/stores/customers.ts";
+import { useRealEstateStore } from "@/stores/realEstate.ts";
 
 type Props =
   | {
       type: "Create";
-      payloadInputs: CreateCustomer;
+      payloadInputs: CreateRealEstate;
     }
   | {
       type: "Update";
-      payloadInputs: CreateCustomer;
-      customerId: Customer["id"];
+      payloadInputs: CreateRealEstate;
+      realEstateId: RealEstate["id"];
     };
 
 const props = defineProps<Props>();
 
-const countriesStore = useCountriesStore();
-const categoriesStore = useCategoriesStore();
-const customersStore = useCustomersStore();
+const featuresStore = useFeaturesStore();
 const appConstantsStore = useAppConstantsStore();
+const customersStore = useCustomersStore();
+const realEstateStore = useRealEstateStore();
+
 const emits = defineEmits(["update:modelValue"]);
 
-const visibilityOptions = appConstantsStore.visibilityOptions;
-const countries = computed(() => countriesStore.countriesList);
-const languages = computed(() => countriesStore.languagesList);
-const { categories } = categoriesStore.getAllCategories();
+const marketOptions = appConstantsStore.market;
+const { documents: features } = featuresStore.getAllDocuments();
+const { documents: customers } = customersStore.getAllDocuments();
+
+const customersOptions = computed(() =>
+  customers.value?.map((el) => {
+    return {
+      id: el.id,
+      name: el.name,
+    };
+  })
+);
 
 const error = ref("");
 const message = ref("");
 
-const previewExperience = ref<CreateCustomer["experience"][0]>({
+const previewAvailable = ref<CreateRealEstate["availableList"][0]>({
   id: "",
-  logo: "",
-  company: "",
-  position: "",
-  country: "",
-  city: "",
-  employmentType: "",
-  start: "",
-  end: "",
-  comment: "",
-});
-
-const changeDateExperience = computed({
-  get: () => [previewExperience.value.start, previewExperience.value.end],
-  set: (arrayDate: Date[] | null[]) => {
-    previewExperience.value.start = arrayDate[0]?.toDateString() || "";
-    previewExperience.value.end = arrayDate[1]?.toDateString() || "";
-  },
+  totalFloor: null,
+  category: "",
+  bedroomsFrom: null,
+  bedroomsTo: null,
+  bathrooms: null,
+  squareFrom: null,
+  squareTo: null,
+  availableUnitsForSale: null,
 });
 
 const inputs = computed({
@@ -66,54 +66,94 @@ const inputs = computed({
     emits("update:modelValue", newValue);
   },
 });
-const imagePreviews = ref<{ [key: number]: string }>({});
 
-const previewImage = (logo: string | File, index: number) => {
-  if (typeof logo === "string") {
-    imagePreviews.value[index] = logo;
-    return;
+const categoriesOptions = computed(() => {
+  if (
+    inputs.value.classification === "Residential" &&
+    inputs.value.typeOfProperty === "House"
+  ) {
+    return appConstantsStore.residencialHouseCategory;
   }
-  const reader = new FileReader();
-  reader.onload = () => {
-    imagePreviews.value[index] = reader.result as string;
-  };
-  reader.readAsDataURL(logo);
-};
 
-watch(
-  () => inputs.value.experience,
-  (newExperience) => {
-    newExperience.forEach((el, index) => {
-      previewImage(el.logo, index);
-    });
-  },
-  { deep: true },
-);
+  if (
+    inputs.value.classification === "Residential" &&
+    inputs.value.typeOfProperty === "Flat"
+  ) {
+    return appConstantsStore.residencialFlatCategory;
+  }
+  if (
+    inputs.value.classification === "Residential" &&
+    inputs.value.typeOfProperty === "Plot"
+  ) {
+    return appConstantsStore.residencialPlotCategory;
+  }
 
-const showExperience = computed(() => {
-  return inputs.value.experience.map((el, index) => {
-    return {
-      ...el,
-      logo: imagePreviews.value[index] || "",
-    };
-  });
+  if (
+    inputs.value.classification === "Commercial" &&
+    inputs.value.typeOfProperty === "Industrial"
+  ) {
+    return appConstantsStore.commercialIndustrialCategory;
+  }
+  if (
+    inputs.value.classification === "Commercial" &&
+    inputs.value.typeOfProperty === "Office"
+  ) {
+    return appConstantsStore.commercialOfficeCategory;
+  }
+  if (
+    inputs.value.classification === "Commercial" &&
+    inputs.value.typeOfProperty === "Building"
+  ) {
+    return appConstantsStore.commercialBuildingCategory;
+  }
+  if (
+    inputs.value.classification === "Commercial" &&
+    inputs.value.typeOfProperty === "Plot"
+  ) {
+    return appConstantsStore.commercialPlotCategory;
+  }
+  if (
+    inputs.value.classification === "Commercial" &&
+    inputs.value.typeOfProperty === "Retail"
+  ) {
+    return appConstantsStore.commercialRetailCategory;
+  }
+
+  if (
+    inputs.value.classification === "Agricultural" &&
+    inputs.value.typeOfProperty === "House"
+  ) {
+    return appConstantsStore.agriculturalHouseCategory;
+  }
+  if (
+    inputs.value.classification === "Agricultural" &&
+    inputs.value.typeOfProperty === "Plot"
+  ) {
+    return appConstantsStore.agriculturalPlotCategory;
+  }
+
+  if (
+    inputs.value.classification === "Parking" &&
+    inputs.value.typeOfProperty === "Parking"
+  ) {
+    return appConstantsStore.parkingParkingCategory;
+  }
+  return "";
 });
 
 const validation = () => {
-  if (inputs.value.phone.length === 0) {
-    error.value = "There must be a phone number!";
+  if (inputs.value.pictures?.length === 0) {
+    error.value = "There must be a pictures!";
     return false;
   }
-  if (inputs.value.email.length === 0) {
-    error.value = "There must be a email!";
+
+  if (inputs.value.documentation?.length === 0) {
+    error.value = "There must be a documentation!";
     return false;
   }
-  if (inputs.value.websiteSocial.length === 0) {
-    error.value = "There must be a website!";
-    return false;
-  }
-  if (!inputs.value.aboutUser) {
-    error.value = "There must be a About User field!";
+
+  if (inputs.value.category?.length === 0) {
+    error.value = "There must be a Category!";
     return false;
   }
 
@@ -128,19 +168,19 @@ const actionPage = async () => {
   let response = { status: 0 };
 
   if (props.type === "Create") {
-    const i: CreateCustomer = inputs.value as CreateCustomer;
+    const i: CreateRealEstate = inputs.value as CreateRealEstate;
     i.createdAt = new Date().toDateString();
     i.updatedAt = new Date().toDateString();
-    response = await customersStore.createCustomer(i);
+    response = await realEstateStore.createDocument(i);
   }
 
-  if (props.type === "Update") {
-    inputs.value.updatedAt = new Date().toDateString();
-    response = await customersStore.updateCustomer(
-      inputs.value,
-      props.customerId,
-    );
-  }
+  // if (props.type === "Update") {
+  //   inputs.value.updatedAt = new Date().toDateString();
+  //   response = await customersStore.updateCustomer(
+  //     inputs.value,
+  //     props.customerId,
+  //   );
+  // }
 
   if (response.status === 0) {
     error.value = "The action is unsuccessful!";
@@ -150,54 +190,56 @@ const actionPage = async () => {
   }
 };
 
-const resetPreviewExperience = () => {
-  for (const key of Object.keys(previewExperience.value)) {
-    (previewExperience.value as Record<string, "">)[key] = "";
+const resetPreviewAvailable = () => {
+  for (const key of Object.keys(previewAvailable.value)) {
+    (previewAvailable.value as Record<string, "">)[key] = null;
   }
 };
 
-const actionExperience = async () => {
-  if (previewExperience.value.id) {
-    inputs.value.experience = inputs.value.experience.map((el) => {
-      if (el.id === previewExperience.value.id) {
-        return {
-          ...previewExperience.value,
-        };
-      }
-    });
+const actionAvailable = async () => {
+  if (previewAvailable.value.id) {
+    inputs.value.availableList =
+      inputs.value.availableList.map((el) => {
+        if (el.id === previewAvailable.value.id) {
+          return {
+            ...previewAvailable.value,
+          };
+        }
+      }) || [];
   } else {
-    inputs.value.experience.push({
-      ...previewExperience.value,
+    inputs.value.availableList.push({
+      ...previewAvailable.value,
       id: generateUniqueId(),
     });
   }
-  resetPreviewExperience();
+  resetPreviewAvailable();
 };
 
-const removeExperience = (id: string) => {
-  inputs.value.experience = inputs.value.experience.filter(
-    (el) => el.id !== id,
+const removeAvailable = (id: string) => {
+  inputs.value.availableList = inputs.value.availableList.filter(
+    (el) => el.id !== id
   );
 };
 
-const changePreviewExperience = (id: string) => {
-  const currentExperience = inputs.value.experience.find((el) => el.id === id);
+const changePreviewAvailable = (id: string) => {
+  const currentExperience = inputs.value.availableList.find(
+    (el) => el.id === id
+  );
   if (currentExperience) {
-    previewExperience.value = { ...currentExperience };
+    previewAvailable.value = { ...currentExperience };
   }
 };
 
-const addSocial = (type: "email" | "phone" | "websiteSocial") => {
-  inputs.value[type].push({
-    type: "",
-    value: "",
+const addFeature = () => {
+  inputs.value.features?.push({
+    id: "",
+    properties: [],
   });
 };
-const removeSocial = (
-  type: "email" | "phone" | "websiteSocial",
-  index: number,
-) => {
-  inputs.value[type] = inputs.value[type].filter((el, ind) => ind !== index);
+const removeFeature = (index: number) => {
+  inputs.value.features = inputs.value.features?.filter(
+    (_el, ind) => ind !== index
+  );
 };
 </script>
 
@@ -207,10 +249,10 @@ const removeSocial = (
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:;">PAGES</a></li>
         <li class="breadcrumb-item active text-uppercase">
-          {{ type }} CUSTOMER
+          {{ type }} Real Estate
         </li>
       </ol>
-      <h1 class="page-header mb-0">{{ type }} Customer</h1>
+      <h1 class="page-header mb-0">{{ type }} Real Estate</h1>
     </div>
   </div>
 
@@ -221,308 +263,595 @@ const removeSocial = (
           <card-header
             class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
           >
-            Customer Information
+            Location
           </card-header>
           <card-body>
             <div class="row">
               <div>
                 <div class="row">
-                  <div class="col-md-6 row-md-3 mb-3">
+                  <div class="mb-3 col-md-6">
                     <label class="form-label"
-                      >Photo <span class="text-danger"></span
-                    ></label>
-                    <InputImage v-model="inputs.photo"></InputImage>
+                      >Address <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.address"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Address"
+                    />
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <div class="mb-3">
-                      <label class="form-label"
-                        >Name <span class="text-danger">*</span></label
-                      >
-                      <input
-                        v-model="inputs.name"
-                        type="text"
-                        class="form-control"
-                        name="name"
-                        required
-                        placeholder="Customer name"
-                      />
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label"
-                        >Surname <span class="text-danger">*</span></label
-                      >
-                      <input
-                        v-model="inputs.surname"
-                        type="text"
-                        class="form-control"
-                        name="surname"
-                        required
-                        placeholder="Customer surname"
-                      />
-                    </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Location lat <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.locationLat"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Location lat"
+                    />
+                  </div>
 
-                    <div class="mb-3">
-                      <label class="form-label"
-                        >REF <span class="text-danger">*</span></label
-                      >
-                      <input
-                        v-model="inputs.ref"
-                        type="text"
-                        class="form-control"
-                        name="ref"
-                        required
-                        placeholder="Customer REF"
-                      />
-                    </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Location ing <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.locationIng"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Location ing"
+                    />
                   </div>
                 </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Type account <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.typeAccount"
-                  :options="['Business account', 'Personal account']"
-                  placeholder="Select an option"
-                >
-                </vue-select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Company <span class="text-danger">*</span></label
-                >
-                <input
-                  required
-                  v-model="inputs.company"
-                  type="text"
-                  class="form-control"
-                  name="surname"
-                  placeholder="Company title"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Year of the company's foundation
-                  <span class="text-danger">*</span></label
-                >
-                <input
-                  required
-                  v-model="inputs.yearCompanyFoundation"
-                  type="number"
-                  class="form-control"
-                  name="surname"
-                  placeholder=""
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Role </label>
-                <vue-select
-                  v-model="inputs.role"
-                  :options="[
-                    'Owner',
-                    'Manager',
-                    'Agent',
-                    'Lead',
-                    'Buyer',
-                    'Coordinator',
-                    'Integrator',
-                    'Marketing',
-                    'Receptionist',
-                    'Team leader',
-                  ]"
-                  placeholder="Select an option"
-                ></vue-select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Category </label>
-                <select v-model="inputs.categoryId" class="form-select">
-                  <option selected value="">Select a category</option>
-                  <option
-                    v-for="category in categories"
-                    :key="category.id"
-                    :value="category.id"
-                  >
-                    {{ category.title }}
-                  </option>
-                </select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Country <span class="text-danger">*</span>
-                </label>
-                <vue-select
-                  v-model="inputs.country"
-                  :options="countries"
-                  placeholder="Select an country"
-                >
-                  <template #search-template="{ attributes, events }">
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Confirm the Address
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Street <span class="text-danger">*</span></label
+                    >
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.country"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.street"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Street"
                     />
-                  </template>
-                </vue-select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >State <span class="text-danger">*</span></label
-                >
-                <input
-                  v-model="inputs.state"
-                  required
-                  type="text"
-                  class="form-control"
-                  name="state"
-                  placeholder="Customer state"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >City <span class="text-danger">*</span></label
-                >
-                <input
-                  v-model="inputs.city"
-                  required
-                  type="text"
-                  class="form-control"
-                  name="city"
-                  placeholder="Customer city"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Address <span class="text-danger">*</span></label
-                >
-                <input
-                  v-model="inputs.address"
-                  required
-                  type="text"
-                  class="form-control"
-                  name="address"
-                  placeholder="Customer address"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Language <span class="text-danger">*</span>
-                </label>
-                <vue-select
-                  v-model="inputs.language"
-                  :options="languages"
-                  placeholder="Select an language"
-                >
-                  <template #search-template="{ attributes, events }">
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Number <span class="text-danger">*</span></label
+                    >
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.language"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.number"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Number"
                     />
-                  </template>
-                </vue-select>
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Floor <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.floor"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Floor"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Door <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.door"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Door"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Zip Code <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.zipCode"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Zip Code"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >City <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.city"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="City"
+                    />
+                  </div>
+                </div>
               </div>
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            General information
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Reference <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.reference"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Reference"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Market <span class="text-danger">*</span></label
+                    >
+                    <vue-select
+                      v-model="inputs.market"
+                      :options="marketOptions"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.market"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
 
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Partners <span class="text-danger">*</span></label
-                >
-                <input
-                  v-model="inputs.partners"
-                  required
-                  type="number"
-                  class="form-control"
-                  name="partners"
-                  placeholder="Customer partners"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Listings <span class="text-danger">*</span></label
-                >
-                <input
-                  v-model="inputs.listings"
-                  required
-                  type="number"
-                  class="form-control"
-                  name="listings"
-                  placeholder="Customer listings"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Available slots </label>
-                <input
-                  v-model="inputs.availableSlots"
-                  type="number"
-                  class="form-control"
-                  name="availableSlots"
-                  placeholder="Available slots"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Customers </label>
-                <input
-                  v-model="inputs.customers"
-                  type="number"
-                  class="form-control"
-                  name="customers"
-                  placeholder="Customer customers"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Leads </label>
-                <input
-                  v-model="inputs.leads"
-                  type="number"
-                  class="form-control"
-                  name="leads"
-                  placeholder="Customer leads"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Buyers </label>
-                <input
-                  v-model="inputs.buyers"
-                  type="number"
-                  class="form-control"
-                  name="buyers"
-                  placeholder="Customer buyers"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Sellers </label>
-                <input
-                  v-model="inputs.sellers"
-                  type="number"
-                  class="form-control"
-                  name="sellers"
-                  placeholder="Customer sellers"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Followers </label>
-                <input
-                  v-model="inputs.followers"
-                  type="number"
-                  class="form-control"
-                  name="followers"
-                  placeholder="Customer followers"
-                />
-              </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Clasification <span class="text-danger">*</span></label
+                    >
+                    <vue-select
+                      v-model="inputs.classification"
+                      :options="appConstantsStore.classification"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.classification"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
 
-              <div class="">
-                <label class="form-label"
-                  >About user <span class="text-danger">*</span></label
-                >
-                <div class="form-control p-0">
-                  <div class="border-0">
-                    <quill-editor
-                      v-model:content="inputs.aboutUser"
-                      contentType="html"
-                      theme="snow"
-                      class="h-250px"
+                  <div class="mb-3 col-md-6" v-if="inputs.classification">
+                    <label class="form-label"
+                      >Type of property
+                      <span class="text-danger">*</span></label
+                    >
+                    <vue-select
+                      v-if="inputs.classification === 'Agricultural'"
+                      v-model="inputs.typeOfProperty"
+                      :options="appConstantsStore.agriculturalType"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.typeOfProperty"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+
+                    <vue-select
+                      v-if="inputs.classification === 'Commercial'"
+                      v-model="inputs.typeOfProperty"
+                      :options="appConstantsStore.comercialType"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.typeOfProperty"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+
+                    <vue-select
+                      v-if="inputs.classification === 'Parking'"
+                      v-model="inputs.typeOfProperty"
+                      :options="appConstantsStore.parkingType"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.typeOfProperty"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+
+                    <vue-select
+                      v-if="inputs.classification === 'Residential'"
+                      v-model="inputs.typeOfProperty"
+                      :options="appConstantsStore.residencialType"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.typeOfProperty"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
+
+                  <div class="mb-3 col-md-6" v-if="inputs.typeOfProperty">
+                    <label class="form-label"
+                      >Category <span class="text-danger">*</span></label
+                    >
+                    <vue-select
+                      v-model="inputs.category"
+                      :options="categoriesOptions"
+                      placeholder="Select an option"
+                      multiple
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.category"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Building details
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Year of construction </label>
+                    <input
+                      v-model="inputs.yearOfConstruction"
+                      type="number"
+                      class="form-control"
+                      placeholder="Year of construction"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Total floor</label>
+                    <input
+                      v-model="inputs.totalFloor"
+                      type="number"
+                      class="form-control"
+                      placeholder="Total floor"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Residential complex </label>
+                    <input
+                      v-model="inputs.residentialComplex"
+                      type="text"
+                      class="form-control"
+                      placeholder="Residential complex"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Land and supply details
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Size plot </label>
+                    <input
+                      v-model="inputs.sizePlot"
+                      type="number"
+                      class="form-control"
+                      placeholder="Size plot"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Purpose land </label>
+                    <vue-select
+                      v-model="inputs.purposeLand"
+                      :options="appConstantsStore.purposeLand"
+                      placeholder="Select an option"
+                    >
+                    </vue-select>
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Energy </label>
+                    <vue-select
+                      v-model="inputs.energy"
+                      :options="appConstantsStore.statusFirst"
+                      placeholder="Select an option"
+                    >
+                    </vue-select>
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Water </label>
+                    <vue-select
+                      v-model="inputs.water"
+                      :options="appConstantsStore.statusSecond"
+                      placeholder="Select an option"
+                    >
+                    </vue-select>
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Gas </label>
+                    <vue-select
+                      v-model="inputs.gas"
+                      :options="appConstantsStore.statusThird"
+                      placeholder="Select an option"
+                    >
+                    </vue-select>
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Mobile coverage </label>
+                    <vue-select
+                      v-model="inputs.mobileCoverage"
+                      :options="appConstantsStore.coverageOptions"
+                      placeholder="Select an option"
+                    >
+                    </vue-select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Promotion details of new building
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Discount or special promotion
+                      <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      v-model="inputs.discountOrSpecialPromotion"
+                      type="text"
+                      required
+                      class="form-control"
+                      placeholder="Discount or special promotion"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Buildings <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      required
+                      v-model="inputs.buildings"
+                      type="number"
+                      class="form-control"
+                      placeholder="Buildings"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Apartaments <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      required
+                      v-model="inputs.apartments"
+                      type="number"
+                      class="form-control"
+                      placeholder="Apartaments"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Nº Parkings <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      required
+                      v-model="inputs.numberParkings"
+                      type="number"
+                      class="form-control"
+                      placeholder="Nº Parkings"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Nº blocks <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      required
+                      v-model="inputs.numberBlocks"
+                      type="number"
+                      class="form-control"
+                      placeholder="Nº blocks"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Delivery data <span class="text-danger">*</span>
+                    </label>
+                    <datepicker
+                      v-model="inputs.deliveryDate"
+                      :enable-time-picker="false"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Stage <span class="text-danger">*</span>
+                    </label>
+                    <vue-select
+                      v-model="inputs.stage"
+                      :options="appConstantsStore.stage"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.stage"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Sale status <span class="text-danger">*</span>
+                    </label>
+                    <vue-select
+                      v-model="inputs.saleStatus"
+                      :options="appConstantsStore.saleStatus"
+                      placeholder="Select an option"
+                    >
+                      <template #search-template="{ attributes, events }">
+                        <input
+                          class="vs__search form-control"
+                          :required="!inputs.saleStatus"
+                          v-bind="attributes"
+                          v-on="events"
+                        />
+                      </template>
+                    </vue-select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Price
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Price from <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.priceFrom"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Price from"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Price to <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.priceTo"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Price to"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Rental price </label>
+                    <input
+                      v-model="inputs.rentalPrice"
+                      type="number"
+                      class="form-control"
+                      placeholder="Rental price"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Price condition </label>
+                    <input
+                      v-model="inputs.priceCondition"
+                      type="number"
+                      class="form-control"
+                      placeholder="Price condition"
                     />
                   </div>
                 </div>
@@ -536,7 +865,7 @@ const removeSocial = (
               class="d-flex align-items-center fw-400 bg-inverse bg-opacity-15"
             >
               <div class="flex-1">
-                <div>Experience</div>
+                <div>Available list</div>
               </div>
             </card-header>
             <card-body>
@@ -545,49 +874,50 @@ const removeSocial = (
                   <table class="table table-hover text-nowrap">
                     <thead>
                       <tr>
+                        <th class="pt-0 pb-2">Total floor</th>
+                        <th class="pt-0 pb-2">Category</th>
+                        <th class="pt-0 pb-2">Bedrooms</th>
+                        <th class="pt-0 pb-2">Bathrooms</th>
+                        <th class="pt-0 pb-2">Square</th>
+                        <th class="pt-0 pb-2">Square</th>
+                        <th class="pt-0 pb-2">Available units for sale</th>
                         <th class="pt-0 pb-2"></th>
-                        <th class="pt-0 pb-2">Company</th>
-                        <th class="pt-0 pb-2">Position</th>
-                        <th class="pt-0 pb-2">Work period</th>
-                        <th class="pt-0 pb-2">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr
-                        v-for="experience in showExperience"
-                        :key="experience.id"
+                        v-for="available in inputs.availableList"
+                        :key="available.id"
                       >
-                        <td>
-                          <div class="d-flex align-items-center">
-                            <div
-                              class="w-60px h-60px bg-gray-100 d-flex align-items-center justify-content-center"
-                            >
-                              <img
-                                alt=""
-                                class="mw-100 mh-100"
-                                :src="experience.logo"
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td class="align-middle">{{ experience.company }}</td>
-                        <td class="align-middle">{{ experience.position }}</td>
                         <td class="align-middle">
-                          {{ formatDate(experience.start) }} -
-                          {{ formatDate(experience.end) }}
+                          {{ available?.totalFloor }}
                         </td>
+                        <td class="align-middle">{{ available?.category }}</td>
+                        <td class="align-middle">
+                          {{ available?.bedroomsFrom }} -
+                          {{ available?.bedroomsTo }}
+                        </td>
+                        <td class="align-middle">{{ available?.bathrooms }}</td>
+                        <td class="align-middle">
+                          {{ available?.squareFrom }} -
+                          {{ available?.squareTo }}
+                        </td>
+                        <td class="align-middle">
+                          {{ available?.availableUnitsForSale }}
+                        </td>
+
                         <td class="align-middle">
                           <div class="d-flex align-items-center gap-1">
                             <button
                               type="button"
-                              @click="changePreviewExperience(experience.id)"
+                              @click="changePreviewAvailable(available.id)"
                               class="btn btn-light"
                             >
                               <i class="fas fa-edit"></i>
                             </button>
                             <button
                               type="button"
-                              @click="removeExperience(experience.id)"
+                              @click="removeAvailable(available.id)"
                               class="btn btn-light"
                             >
                               <i class="fas fa-trash-alt"></i>
@@ -601,94 +931,108 @@ const removeSocial = (
                 <div class="col-lg-4">
                   <form
                     id="form-add-expirience"
-                    @submit.prevent="actionExperience"
+                    @submit.prevent="actionAvailable"
                   >
                     <div class="mb-3">
-                      <label class="form-label">Logo </label>
-                      <InputImage v-model="previewExperience.logo"></InputImage>
+                      <label class="form-label">Total floor</label>
+                      <input
+                        v-model="previewAvailable.totalFloor"
+                        type="number"
+                        class="form-control"
+                      />
                     </div>
+
                     <div class="mb-3">
                       <label class="form-label"
-                        >Company <span class="text-danger">*</span></label
+                        >Category <span class="text-danger">*</span></label
                       >
                       <input
-                        v-model="previewExperience.company"
+                        v-model="previewAvailable.category"
                         required
                         type="text"
                         class="form-control"
-                        name="company"
-                        placeholder="Company title"
                       />
                     </div>
+
                     <div class="mb-3">
                       <label class="form-label"
-                        >Position <span class="text-danger">*</span></label
+                        >Bedrooms from <span class="text-danger">*</span></label
                       >
                       <input
-                        v-model="previewExperience.position"
+                        v-model="previewAvailable.bedroomsFrom"
                         required
-                        type="text"
+                        type="number"
                         class="form-control"
-                        name="position"
-                        placeholder="Position"
                       />
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label">Country </label>
-                      <vue-select
-                        v-model="previewExperience.country"
-                        :options="countries"
-                        placeholder="Select an country"
-                      ></vue-select>
                     </div>
                     <div class="mb-3">
                       <label class="form-label"
-                        >City <span class="text-danger"></span
-                      ></label>
+                        >Bedrooms to <span class="text-danger">*</span></label
+                      >
                       <input
-                        v-model="previewExperience.city"
-                        type="text"
+                        v-model="previewAvailable.bedroomsTo"
+                        required
+                        type="number"
                         class="form-control"
-                        name="city"
-                        placeholder="City"
                       />
                     </div>
+
                     <div class="mb-3">
-                      <label class="form-label">Employment type </label>
-                      <vue-select
-                        v-model="previewExperience.employmentType"
-                        :options="[
-                          'Full time',
-                          'Part time',
-                          'Self-employed',
-                          'Freelancer',
-                          'Intership',
-                        ]"
-                        placeholder="Select an option"
-                      ></vue-select>
-                    </div>
-                    <div class="mb-3">
-                      <label class="form-label">Work period </label>
-                      <datepicker
-                        v-model="changeDateExperience"
-                        :enable-time-picker="false"
-                        range
-                        multiCalendars
+                      <label class="form-label"
+                        >Bathrooms
+
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        v-model="previewAvailable.bathrooms"
+                        required
+                        type="number"
+                        class="form-control"
                       />
                     </div>
+
                     <div class="mb-3">
-                      <label class="form-label">Comment</label>
-                      <div class="form-control p-0">
-                        <div class="border-0">
-                          <quill-editor
-                            v-model:content="previewExperience.comment"
-                            contentType="html"
-                            theme="snow"
-                            class="h-250px"
-                          />
-                        </div>
-                      </div>
+                      <label class="form-label"
+                        >Square from
+
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        v-model="previewAvailable.squareFrom"
+                        required
+                        type="number"
+                        class="form-control"
+                      />
                     </div>
+
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >Square to
+
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        v-model="previewAvailable.squareTo"
+                        required
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label"
+                        >Available units for sale
+
+                        <span class="text-danger">*</span></label
+                      >
+                      <input
+                        v-model="previewAvailable.availableUnitsForSale"
+                        required
+                        type="number"
+                        class="form-control"
+                      />
+                    </div>
+
                     <div class="d-flex justify-content-end">
                       <button
                         class="btn btn-theme fileinput-button me-2 mb-1"
@@ -696,15 +1040,15 @@ const removeSocial = (
                         form="form-add-expirience"
                       >
                         <i
-                          v-if="!previewExperience.id"
+                          v-if="!previewAvailable.id"
                           class="fa fa-fw fa-plus"
                         ></i>
                         <i
-                          v-if="previewExperience.id"
+                          v-if="previewAvailable.id"
                           class="fa fa-fw fa-edit"
                         ></i>
-                        <span v-if="!previewExperience.id">Add Experience</span>
-                        <span v-if="previewExperience.id"
+                        <span v-if="!previewAvailable.id">Add Experience</span>
+                        <span v-if="previewAvailable.id"
                           >Update Experience</span
                         >
                       </button>
@@ -715,617 +1059,160 @@ const removeSocial = (
             </card-body>
           </card>
         </div>
-
         <card class="mb-4">
           <card-header
-            class="d-flex align-items-center bg-inverse bg-opacity-15 fw-400"
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
           >
-            Contacts
+            Developer details
           </card-header>
           <card-body>
-            <div>
-              <div class="d-flex align-items-center justify-content-between">
-                <p><strong>Phone</strong></p>
-                <button
-                  type="button"
-                  @click="addSocial('phone')"
-                  class="btn btn-theme fileinput-button me-2 mb-1"
-                >
-                  <i class="fa fa-fw fa-plus"></i>
-                  <span>Add phone...</span>
-                </button>
-              </div>
-              <div class="row mb-3 fw-bold text-body">
-                <div class="col">Option type</div>
-                <div class="col">Option values</div>
-                <div class="col-1"></div>
-              </div>
-              <div
-                v-for="(item, index) in inputs.phone"
-                :key="index"
-                class="row mb-3 gx-3"
-              >
-                <div class="col">
-                  <input
-                    required
-                    v-model="item.type"
-                    type="text"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                  />
-                </div>
-                <div class="col">
-                  <input
-                    required
-                    v-model="item.value"
-                    type="text"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                  />
-                </div>
-                <div class="col-1">
-                  <button
-                    type="button"
-                    @click="removeSocial('phone', index)"
-                    href="#"
-                    class="btn btn-default d-block"
-                  >
-                    <i class="fa fa-xmark"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="d-flex align-items-center justify-content-between">
-                <p><strong>Email</strong></p>
-                <button
-                  type="button"
-                  @click="addSocial('email')"
-                  class="btn btn-theme fileinput-button me-2 mb-1"
-                >
-                  <i class="fa fa-fw fa-plus"></i>
-                  <span>Add email...</span>
-                </button>
-              </div>
-              <div class="row mb-3 fw-bold text-body">
-                <div class="col">Option type</div>
-                <div class="col">Option values</div>
-                <div class="col-1"></div>
-              </div>
-              <div
-                v-for="(item, index) in inputs.email"
-                :key="index"
-                class="row mb-3 gx-3"
-              >
-                <div class="col">
-                  <input
-                    required
-                    v-model="item.type"
-                    type="text"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                  />
-                </div>
-                <div class="col">
-                  <input
-                    required
-                    type="email"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                    v-model="item.value"
-                  />
-                </div>
-                <div class="col-1">
-                  <button
-                    type="button"
-                    @click="removeSocial('email', index)"
-                    href="#"
-                    class="btn btn-default d-block"
-                  >
-                    <i class="fa fa-xmark"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div class="d-flex align-items-center justify-content-between">
-                <p><strong>Website/Social</strong></p>
-                <button
-                  type="button"
-                  @click="addSocial('websiteSocial')"
-                  class="btn btn-theme fileinput-button me-2 mb-1"
-                >
-                  <i class="fa fa-fw fa-plus"></i>
-                  <span>Add option...</span>
-                </button>
-              </div>
-              <div class="row mb-3 fw-bold text-body">
-                <div class="col">Option type</div>
-                <div class="col">Option values</div>
-                <div class="col-1"></div>
-              </div>
-              <div
-                v-for="(item, index) in inputs.websiteSocial"
-                :key="index"
-                class="row mb-3 gx-3"
-              >
-                <div class="col">
-                  <input
-                    required
-                    v-model="item.type"
-                    type="text"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                  />
-                </div>
-                <div class="col">
-                  <input
-                    required
-                    type="text"
-                    class="form-control"
-                    name="variant[0][name]"
-                    placeholder=""
-                    v-model="item.value"
-                  />
-                </div>
-                <div class="col-1">
-                  <button
-                    type="button"
-                    @click="removeSocial('websiteSocial', index)"
-                    href="#"
-                    class="btn btn-default d-block"
-                  >
-                    <i class="fa fa-xmark"></i>
-                  </button>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Company developer
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.developerDetails.companyDeveloper"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Company developer"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Contact person
+
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.developerDetails.contactPerson"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Contact person"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Phone
+
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.developerDetails.phone"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Phone"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Adress company
+
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.developerDetails.addressCompany"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Adress company"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Owner
+
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.developerDetails.owner"
+                      type="text"
+                      class="form-control"
+                      required
+                      placeholder="Owner"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </card-body>
         </card>
-
         <card class="mb-4">
           <card-header
-            class="d-flex align-items-center bg-inverse bg-opacity-15 fw-400"
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
           >
-            Notifications
+            Features
           </card-header>
           <card-body>
-            <div class="p-3 bg-inverse bg-opacity-10">
-              <div class="form-group mb-0">
-                <div class="shipping-container">
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">Display block catalogue</div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.displayBlockCatalogue"
-                          :options="['Countries', 'Type', 'Class', 'Market']"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Sold </label>
+                    <vue-select
+                      v-model="inputs.sold"
+                      :options="appConstantsStore.sold"
+                      placeholder="Select an option"
+                    ></vue-select>
                   </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Display comision for partners
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.displayComisionForPartners"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <p><strong>Popular features </strong></p>
+                    <button
+                      @click="addFeature"
+                      type="button"
+                      class="btn btn-theme fileinput-button me-2 mb-1"
+                    >
+                      <i class="fa fa-fw fa-plus"></i>
+                      <span>Add feature...</span>
+                    </button>
                   </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">Display my partners for</div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.displayMyPartnersFor"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Activate comments in my posts for
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.activateCommentsInMyPostsFor"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Receive invitation to group by
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.receiveInvitationToGroupBy"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Receive invitation to events by
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.receiveInvitationToEventsBy"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification payment by status invoice
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <vue-select
-                          v-model="inputs.notificationPaymentByStatusInvoice"
-                          :options="['Failed', 'Paid']"
-                          placeholder="Select an option"
-                        ></vue-select>
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">Alert unreaded contacts</div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <input
-                          v-model="inputs.alertUnreadedContacts"
-                          type="number"
-                          class="form-control"
-                          name="partners"
-                        />
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Alert declined booking a viewing
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <input
-                          v-model="inputs.alertDeclinedBookingAViewing"
-                          type="number"
-                          class="form-control"
-                          name="partners"
-                        />
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification show activity on the market by type in
-                      different cities
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <input
-                          v-model="
-                            inputs.notificationShowActivityOnTheMarketByTypeInDifferentCities
-                          "
-                          type="text"
-                          class="form-control"
-                          name="partners"
-                        />
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification show price analysis by type in diferent
-                      cities
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <input
-                          v-model="
-                            inputs.notificationShowPriceAnalysisByTypeInDifferentCities
-                          "
-                          type="text"
-                          class="form-control"
-                          name="partners"
-                        />
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification subscription Expire Days
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check w-100 form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationSubscriptionExpireDays"
-                          type="number"
-                          class="form-control"
-                          name="partners"
-                        />
-                        <label class="form-check-label" for="">&nbsp;</label>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification display profile
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationDisplayProfile"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingFree"
-                          name="shipping_free_enable"
-                        />
-                        <label class="form-check-label" for="shippingFree"
-                          >&nbsp;</label
+                  <div
+                    v-for="(item, index) in inputs.features"
+                    :key="index"
+                    class="row mb-3 gx-3"
+                  >
+                    <div class="col">
+                      <select v-model="item.id" class="form-select">
+                        <option selected value="">Select a category</option>
+                        <option
+                          v-for="feature in features"
+                          :key="feature.id"
+                          :value="feature.id"
                         >
-                      </div>
+                          {{ feature.title }}
+                        </option>
+                      </select>
                     </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification display real estate
+                    <div class="col">
+                      <vue-select
+                        v-model="item.properties"
+                        :options="
+                          features.find((el) => el.id === item.id)?.properties
+                        "
+                        placeholder="Select an options"
+                        multiple
+                      ></vue-select>
                     </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationDisplayRealEstate"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingAliExpress"
-                          name="shipping_enable"
-                        />
-                        <label class="form-check-label" for="shippingAliExpress"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Who can send me a private message
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.whoCanSendMePrivateMessage"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSaleHoo"
-                          name="shipping_enable"
-                        />
-                        <!-- <vue-select
-                          v-model="inputs.displayMyPartnersFor"
-                          :options="visibilityOptions"
-                          placeholder="Select an option"
-                        ></vue-select> -->
-                        <label class="form-check-label" for="shippingSaleHoo"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification receive request
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationReceiveRequest"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingMegagoods"
-                          name="shipping_enable"
-                        />
-                        <label class="form-check-label" for="shippingMegagoods"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification booking a viewing
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationBookingAViewing"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingWholesale2B"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingWholesale2B"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification make an offer
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationMakeAnOffer"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSunriseWholesale"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingSunriseWholesale"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Receive notification of sharing leads from other partners
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="
-                            inputs.receiveNotificationOfSharingLeadsFromOtherPartners
-                          "
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSunriseWholesale"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingSunriseWholesale"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Receive notification of new added real estate by other
-                      partners
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="
-                            inputs.receiveNotificationOfNewAddedRealEstateByOtherPartners
-                          "
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSunriseWholesale"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingSunriseWholesale"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">
-                      Notification Show Viewing Data
-                    </div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.notificationShowViewingData"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSunriseWholesale"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingSunriseWholesale"
-                          >&nbsp;</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="mt-2 mb-2" />
-
-                  <div class="row align-items-center">
-                    <div class="col-6 pt-1 pb-1">Verified</div>
-                    <div class="col-6 d-flex align-items-center">
-                      <div class="form-check form-switch ms-auto">
-                        <input
-                          v-model="inputs.verified"
-                          type="checkbox"
-                          class="form-check-input"
-                          id="shippingSunriseWholesale"
-                          name="shipping_enable"
-                        />
-                        <label
-                          class="form-check-label"
-                          for="shippingSunriseWholesale"
-                          >&nbsp;</label
-                        >
-                      </div>
+                    <div class="col-1">
+                      <button
+                        @click="removeFeature(index)"
+                        type="button"
+                        href="#"
+                        class="btn btn-default d-block"
+                      >
+                        <i class="fa fa-xmark"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1338,166 +1225,263 @@ const removeSocial = (
           <card-header
             class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
           >
-            Billing information
+            Сomision and taxes
           </card-header>
           <card-body>
             <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Billing method <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.billingMethod"
-                  :options="['E-Invoice', 'Paper invoice']"
-                  placeholder="Select an option"
-                >
-                  <template #search-template="{ attributes, events }">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Partner <span class="text-danger">*</span></label
+                    >
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.billingMethod"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.partnerCommission"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Partner"
                     />
-                  </template>
-                </vue-select>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Billion for <span class="text-danger"></span
-                ></label>
-                <vue-select
-                  v-model="inputs.billingFor"
-                  :options="[
-                    'Membership',
-                    'Subscription',
-                    'Per listing',
-                    'Per lead',
-                  ]"
-                  placeholder="Select an option"
-                >
-                </vue-select>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Billing country <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.billingCountry"
-                  :options="countries"
-                  placeholder="Select an option"
-                >
-                  <template #search-template="{ attributes, events }">
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Type comision </label>
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.billingCountry"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.typeCommission"
+                      type="text"
+                      class="form-control"
+                      placeholder="Type comision"
                     />
-                  </template>
-                </vue-select>
-              </div>
+                  </div>
 
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Billing state <span class="text-danger">*</span></label
-                >
-                <input
-                  required
-                  v-model="inputs.billingState"
-                  type="text"
-                  class="form-control"
-                  name="surname"
-                  placeholder="Billing state"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Billing address
-
-                  <span class="text-danger">*</span></label
-                >
-                <input
-                  required
-                  v-model="inputs.billingAddress"
-                  type="text"
-                  class="form-control"
-                  name="surname"
-                  placeholder="Billing address"
-                />
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Postal code <span class="text-danger">*</span></label
-                >
-                <input
-                  required
-                  v-model="inputs.postalCode"
-                  type="text"
-                  class="form-control"
-                  name="surname"
-                  placeholder="Postal code"
-                />
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Method of payment <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.methodOfPayment"
-                  :options="['Bank account', 'Card']"
-                  placeholder="Select an option"
-                >
-                  <template #search-template="{ attributes, events }">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">HOA fees</label>
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.methodOfPayment"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.hoaFees"
+                      type="number"
+                      class="form-control"
+                      placeholder="HOA fees"
                     />
-                  </template>
-                </vue-select>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Cicle of payment <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.cyclePayment"
-                  :options="['At the begging', 'At the end']"
-                  placeholder="Select an option"
-                >
-                  <template #search-template="{ attributes, events }">
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Tax amount </label>
                     <input
-                      class="vs__search form-control"
-                      :required="!inputs.cyclePayment"
-                      v-bind="attributes"
-                      v-on="events"
+                      v-model="inputs.taxAmount"
+                      type="number"
+                      class="form-control"
+                      placeholder="Tax amount"
                     />
-                  </template>
-                </vue-select>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label"
-                  >Subcriptions <span class="text-danger">*</span></label
-                >
-                <vue-select
-                  v-model="inputs.subscriptions"
-                  :options="['Premium', 'Fremium']"
-                  placeholder="Select an option"
-                ></vue-select>
+                  </div>
+                </div>
               </div>
             </div>
           </card-body>
         </card>
+
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Listing condition and buyer incentive
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Listing agremedemt </label>
+                    <input
+                      v-model="inputs.listingAgreement"
+                      type="text"
+                      class="form-control"
+                      placeholder="Listing agremedemt"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"> Showing requirements</label>
+                    <input
+                      v-model="inputs.showingRequirements"
+                      type="text"
+                      class="form-control"
+                      placeholder=" Showing requirements"
+                    />
+                  </div>
+
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"> Listing terms</label>
+                    <input
+                      v-model="inputs.listingTerms"
+                      type="text"
+                      class="form-control"
+                      placeholder="Listing terms"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"> Buyer incentive</label>
+                    <input
+                      v-model="inputs.buyerIncentive"
+                      type="text"
+                      class="form-control"
+                      placeholder="Buyer incentive"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Multimedia
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="">
+                  <div class="row">
+                    <label class="form-label">About user </label>
+                    <div class="form-control mb-3 p-0">
+                      <div class="border-0">
+                        <quill-editor
+                          v-model:content="inputs.description"
+                          contentType="html"
+                          theme="snow"
+                          class="h-250px"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label"> Video</label>
+                      <input
+                        v-model="inputs.video"
+                        type="text"
+                        class="form-control"
+                        placeholder="Video"
+                      />
+                    </div>
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label"> Virtual tour </label>
+                      <input
+                        v-model="inputs.virtualTour"
+                        type="text"
+                        class="form-control"
+                        placeholder="Virtual tour"
+                      />
+                    </div>
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label">
+                        Energy rating consumption
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        v-model="inputs.energyRatingConsumption"
+                        type="text"
+                        required
+                        class="form-control"
+                        placeholder="Energy rating consumption"
+                      />
+                    </div>
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label">
+                        Energy rating emissions
+                      </label>
+                      <input
+                        v-model="inputs.energyRatingEmissions"
+                        type="text"
+                        class="form-control"
+                        placeholder="Energy rating consumption"
+                      />
+                    </div>
+
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label">
+                        Author/Company
+                        <span class="text-danger">*</span>
+                      </label>
+                      <input
+                        v-model="inputs.authorCompany"
+                        type="text"
+                        required
+                        class="form-control"
+                        placeholder="Author/Company"
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label"
+                        >User <span class="text-danger">*</span>
+                      </label>
+                      <vue-select
+                        v-model="inputs.userId"
+                        :options="customersOptions"
+                        :label="'name'"
+                        :reduce="(option: Customer) => option.id"
+                        placeholder="Select an option"
+                      >
+                        <template #search-template="{ attributes, events }">
+                          <input
+                            class="vs__search form-control"
+                            :required="!inputs.userId"
+                            v-bind="attributes"
+                            v-on="events"
+                          />
+                        </template>
+                      </vue-select>
+                    </div>
+
+                    <div class="mb-3 col-md-6">
+                      <label class="form-label"
+                        >Date <span class="text-danger">*</span>
+                      </label>
+                      <datepicker
+                        v-model="inputs.date"
+                        :enable-time-picker="false"
+                        required
+                      />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label"
+                        >Status <span class="text-danger">*</span>
+                      </label>
+                      <vue-select
+                        v-model="inputs.status"
+                        :options="appConstantsStore.statusListing"
+                        placeholder="Select an option"
+                      >
+                        <template #search-template="{ attributes, events }">
+                          <input
+                            class="vs__search form-control"
+                            :required="!inputs.status"
+                            v-bind="attributes"
+                            v-on="events"
+                          />
+                        </template>
+                      </vue-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
+        <InputFiles
+          showPreview
+          title="Pictures"
+          v-model="inputs.pictures"
+        ></InputFiles>
+        <InputFiles
+          title="Documentation"
+          v-model="inputs.documentation"
+        ></InputFiles>
       </div>
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
       <div v-if="message" class="alert alert-success">{{ message }}</div>
       <button type="submit" form="form-main-user" class="btn btn-theme">
-        {{ type }} customer
+        {{ type }} real Estate
       </button>
     </form>
   </div>

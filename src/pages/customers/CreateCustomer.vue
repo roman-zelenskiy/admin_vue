@@ -57,14 +57,6 @@ const inputs = ref<CreateCustomer>({
   createdAt: "",
   updatedAt: "",
 });
-
-watch(
-  inputs,
-  () => {
-    console.log(inputs.value);
-  },
-  { deep: true }
-);
 </script>
 
 <template>

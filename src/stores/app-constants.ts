@@ -67,8 +67,8 @@ export const useAppConstantsStore = defineStore("constants", () => {
   const market: RealEstate["market"][] = ["New building", "Resale", "Lands"];
 
   const classification: RealEstate["classification"][] = [
-    "Residencial",
-    "Comercial",
+    "Residential",
+    "Commercial",
     "Agricultural",
     "Parking",
   ];
@@ -199,6 +199,14 @@ export const useAppConstantsStore = defineStore("constants", () => {
     "Banned listing",
   ];
 
+  const sold: RealEstate["sold"][] = ["Furnished", "Partly", "Unfurnished"];
+
+  const coverageOptions: Array<
+    "Full coverage" | "Stable coverage" | "Good coverage" | "Bad coverage"
+  > = ["Full coverage", "Stable coverage", "Good coverage", "Bad coverage"];
+
+  const statusListing = ["Active listing", "Draft listing", "Banned listing"];
+
   return {
     visibilityOptions,
     typeAccountOptions,
@@ -232,5 +240,8 @@ export const useAppConstantsStore = defineStore("constants", () => {
     statusThird,
     stage,
     saleStatus,
+    sold,
+    coverageOptions,
+    statusListing
   };
 });

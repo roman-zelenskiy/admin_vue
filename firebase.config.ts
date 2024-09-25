@@ -36,6 +36,7 @@ export const db = getFirestore(firebaseApp);
 export const categoriesCollection = collection(db, "user-categories");
 export const usersCollection = collection(db, "customers");
 export const realEstateCollection = collection(db, "real-estate");
+export const featuresCollection = collection(db, "features");
 
 export const storage = getStorage(firebaseApp);
 

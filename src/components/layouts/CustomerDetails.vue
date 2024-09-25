@@ -57,11 +57,12 @@ const previewExperience = ref<CreateCustomer["experience"][0]>({
 
 const changeDateExperience = computed({
   get: () => [previewExperience.value.start, previewExperience.value.end],
-  set: (arrayDate: Date[] | null[]) => {
-    previewExperience.value.start = arrayDate[0]?.toISOString() || "";
-    previewExperience.value.end = arrayDate[1]?.toISOString() || "";
+  set: (arrayDate: string[] | null[]) => {
+    previewExperience.value.start = arrayDate[0] || "";
+    previewExperience.value.end = arrayDate[1] || "";
   },
 });
+
 
 const inputs = computed({
   get: () => props.payloadInputs,

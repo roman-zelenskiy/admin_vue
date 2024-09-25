@@ -35,6 +35,18 @@ const router = createRouter({
           component: () => import("../pages/real_estate/RealEstateList.vue"),
         },
         {
+          path: "/features",
+          component: () => import("../pages/features/FeaturesList.vue"),
+        },
+        {
+          path: "/feature-create",
+          component: () => import("../pages/features/CreateFeatures.vue"),
+        },
+        {
+          path: "/feature-update/:id",
+          component: () => import("../pages/features/UpdateFeatures.vue"),
+        },
+        {
           path: "/real-estate-create",
           component: () => import("../pages/real_estate/CreateRealEstate.vue"),
         },
