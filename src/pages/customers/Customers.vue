@@ -33,6 +33,10 @@ const filters: { value: CustomersFilters; title: string }[] = [
     title: "Name",
   },
   {
+    value: "company",
+    title: "Company",
+  },
+  {
     value: "createdAt",
     title: "Created at",
   },

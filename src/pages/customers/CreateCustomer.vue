@@ -54,6 +54,7 @@ const inputs = ref<CreateCustomer>({
   subscriptions: null,
   company: "",
   yearCompanyFoundation: null,
+  skills: [],
   createdAt: "",
   updatedAt: "",
 });

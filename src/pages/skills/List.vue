@@ -1,29 +1,28 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { useRealEstateStore } from "@/stores/realEstate.ts";
-import { formatDate } from "@/utils";
+import { useSkillsStore } from "@/stores/skills";
 
 import Pagination from "@/components/ui/Pagination.vue";
 import ModalConfirmation from "@/components/ui/ModalConfirmation.vue";
 
-const realEstateStore = useRealEstateStore();
+const skillsStore = useSkillsStore();
 
 const page = ref(1);
 const searchValue = ref("");
-const currentFilter = ref<RealEstateFilters>("");
+const currentFilter = ref<CategoryFilters>("");
 const totalPages = ref(0);
-const docs = ref<RealEstate[]>([]);
+const documents = ref<Skills[]>([]);
 const currentCategoryId = ref<string>("");
 const isModalDelete = ref(false);
 
-const filters: { value: RealEstateFilters; title: string }[] = [
+const filters: { value: CategoryFilters; title: string }[] = [
   {
     value: "id",
     title: "Id",
   },
   {
-    value: "address",
-    title: "Address",
+    value: "title",
+    title: "Title",
   },
   {
     value: "createdAt",
@@ -34,6 +33,7 @@ const filters: { value: RealEstateFilters; title: string }[] = [
 const changeCurrentId = (value: string) => {
   currentCategoryId.value = value;
 };
+
 const switchModalDelete = (value: boolean, id: string) => {
   if (value) {
     changeCurrentId(id);
@@ -41,35 +41,35 @@ const switchModalDelete = (value: boolean, id: string) => {
   isModalDelete.value = value;
 };
 
-const changeFilter = (filterKey: RealEstateFilters) => {
+const changeFilter = (filterKey: CategoryFilters) => {
   currentFilter.value = filterKey;
 };
 
-const getDocuments = async () => {
-  const { documents, totalPages: total } =
-    await realEstateStore.getItemsByFilters(page.value, {
+const getCategories = async () => {
+  const { documents: list, totalPages: total } =
+    await skillsStore.getDocsByFilters(page.value, {
       filterValue: searchValue.value,
       filterKey: currentFilter.value,
     });
-  docs.value = documents || [];
+  documents.value = list || [];
   totalPages.value = total;
 };
 
-const deleteCategory = async (documentId: Customer["id"]) => {
-  await realEstateStore.deleteDocument(documentId);
-  await getDocuments();
+const deleteCategory = async (categoryId: Skills["id"]) => {
+  await skillsStore.deleteDocument(categoryId);
+  await getCategories();
   switchModalDelete(false, "");
 };
 
 watch(
   [page, searchValue],
   () => {
-    getDocuments();
+    getCategories();
   },
   { deep: true }
 );
 
-getDocuments();
+getCategories();
 </script>
 
 <template>
@@ -77,22 +77,21 @@ getDocuments();
     <ModalConfirmation
       @actionSuccess="deleteCategory(currentCategoryId)"
       v-model="isModalDelete"
-      :title="'Delete a customer?'"
+      :title="'Delete a category?'"
     ></ModalConfirmation>
     <!-- <button @">load more</button> -->
     <div>
       <ul class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">PAGES</a></li>
-        <li class="breadcrumb-item active text-uppercase">Real estate</li>
+        <li class="breadcrumb-item active text-uppercase">Skills</li>
       </ul>
-      <h1 class="page-header mb-0">Real estate</h1>
+      <h1 class="page-header mb-0">Skills</h1>
       <!-- {{ totalPages }} -->
     </div>
 
     <div class="ms-auto">
-      <RouterLink to="/real-estate-create" href="#" class="btn btn-theme"
-        ><i class="fa fa-plus-circle fa-fw me-1"></i> Create Real
-        estate</RouterLink
+      <RouterLink to="/skills-create" href="#" class="btn btn-theme"
+        ><i class="fa fa-plus-circle fa-fw me-1"></i> Add Skills</RouterLink
       >
     </div>
   </div>
@@ -111,7 +110,7 @@ getDocuments();
           >
             {{
               filters.find((el) => currentFilter == el.value)?.title ||
-              "Filter real estate"
+              "Filter categories"
             }}
             &nbsp;
           </button>
@@ -150,41 +149,29 @@ getDocuments();
             <thead>
               <tr>
                 <th class="pt-0 pb-2">Id</th>
-                <th class="pt-0 pb-2">Address</th>
-                <th class="pt-0 pb-2">User</th>
-                <th class="pt-0 pb-2">Company developer</th>
+                <th class="pt-0 pb-2">Title</th>
                 <th class="pt-0 pb-2">Created At</th>
+                <th class="pt-0 pb-2">Updated At</th>
                 <th class="pt-0 pb-2"></th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(realEstate, index) in docs"
-                :key="realEstate.id || index"
-              >
-                <td class="align-middle">{{ realEstate?.id }}</td>
-                <td class="align-middle">
-                  <div class="">
-                    <RouterLink :to="/real-estate-update/ + realEstate?.id">{{
-                      realEstate.address
-                    }}</RouterLink>
+              <tr v-for="category in documents" :key="category.id">
+                <td class="align-middle">{{ category.id }}</td>
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div>
+                      <RouterLink :to="/feature-update/ + category.id">{{
+                        category.title
+                      }}</RouterLink>
+                    </div>
                   </div>
                 </td>
-
-                <td class="align-middle">
-                  {{ realEstate?.user?.name || "null" }}
-                </td>
-                <td class="align-middle">
-                  {{ realEstate?.developerDetails?.companyDeveloper || "null" }}
-                </td>
-                <td class="align-middle">
-                  {{
-                    realEstate.createdAt ? formatDate(realEstate.createdAt) : ""
-                  }}
-                </td>
+                <td class="align-middle">{{ category?.createdAt }}</td>
+                <td class="align-middle">{{ category?.updatedAt }}</td>
                 <td class="align-middle">
                   <button
-                    @click="switchModalDelete(true, realEstate?.id)"
+                    @click="switchModalDelete(true, category.id)"
                     class="btn btn-light"
                   >
                     <i class="fas fa-trash-alt"></i>
@@ -205,11 +192,3 @@ getDocuments();
     </div>
   </card>
 </template>
-
-<style>
-.icon {
-  width: 50%;
-  height: 40%;
-  fill: var(--bs-theme);
-}
-</style>

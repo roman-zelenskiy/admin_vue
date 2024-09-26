@@ -97,6 +97,10 @@ declare interface Customer {
   company: string;
   yearCompanyFoundation: number;
   subscriptions?: "Premium" | "Fremium" | null;
+  skills?: {
+    id: string;
+    properties: string[];
+  }[];
   createdAt: string;
   updatedAt: string;
 }
@@ -118,6 +122,4 @@ declare interface CreateCustomer extends Omit<Customer, "id"> {
   }[];
 }
 
-
-
-declare type CustomersFilters = "id" | "name" | "createdAt" | "";
+declare type CustomersFilters = "id" | "name" | "createdAt" | "company" | "";

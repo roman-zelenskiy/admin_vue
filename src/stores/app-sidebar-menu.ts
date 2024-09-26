@@ -33,6 +33,11 @@ export const useAppSidebarMenuStore = defineStore({
         icon: "fa fa-list-alt",
         text: "Features",
       },
+      {
+        url: "/skills",
+        icon: "fa fa-check-circle",
+        text: "Skills",
+      },
       // {
       //   url: "/analytics",
       //   icon: "fa fa-chart-pie",

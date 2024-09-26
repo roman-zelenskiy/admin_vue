@@ -1,65 +1,79 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import CustomerDetails from "@/components/layouts/CustomerDetails.vue";
+import RealEstateDetails from "@/components/layouts/RealEstateDetails.vue";
 import { useRoute } from "vue-router";
-import { useCustomersStore } from "@/stores/customers";
+import { useRealEstateStore } from "@/stores/realEstate.ts";
 
-const customersStore = useCustomersStore();
+const realEstateStore = useRealEstateStore();
 const route = useRoute();
-const customerId = `${route.params.id}`;
+const id = `${route.params.id}`;
 
-const inputs = ref<CreateCustomer>({
-  name: "",
-  surname: "",
-  aboutUser: "",
-  categoryId: "",
-  ref: "",
-  typeAccount: "Personal account",
-  country: "",
-  state: "",
-  city: "",
+const inputs = ref<CreateRealEstate>({
   address: "",
-  language: "",
-  partners: 0,
-  listings: 0,
-  photo: null,
-  phone: [],
-  email: [],
-  websiteSocial: [],
-  experience: [],
-  notificationDisplayProfile: false,
-  notificationDisplayRealEstate: false,
-  whoCanSendMePrivateMessage: false,
-  notificationReceiveRequest: false,
-  notificationBookingAViewing: false,
-  notificationMakeAnOffer: false,
-  receiveNotificationOfSharingLeadsFromOtherPartners: false,
-  receiveNotificationOfNewAddedRealEstateByOtherPartners: false,
-  notificationShowViewingData: false,
-  verified: false,
-  displayBlockCatalogue: "Countries",
-  displayComisionForPartners: "All users",
-  displayMyPartnersFor: "All users",
-  activateCommentsInMyPostsFor: "All users",
-  receiveInvitationToGroupBy: "All users",
-  receiveInvitationToEventsBy: "All users",
-  notificationPaymentByStatusInvoice: "Failed",
-  alertUnreadedContacts: 0,
-  alertDeclinedBookingAViewing: 0,
-  notificationShowActivityOnTheMarketByTypeInDifferentCities: "",
-  notificationShowPriceAnalysisByTypeInDifferentCities: "",
-  notificationSubscriptionExpireDays: 0,
-  billingMethod: "",
-  billingFor: null,
-  billingCountry: "",
-  billingState: "",
-  billingAddress: "",
-  postalCode: "",
-  methodOfPayment: "",
-  cyclePayment: "",
-  subscriptions: null,
-  company: "",
-  yearCompanyFoundation: null,
+  locationLat: "",
+  locationIng: "",
+  street: "",
+  number: "",
+  floor: "",
+  door: "",
+  zipCode: "",
+  city: "",
+  reference: "",
+  market: null,
+  classification: null,
+  typeOfProperty: null,
+  category: [],
+  yearOfConstruction: null,
+  totalFloor: null,
+  residentialComplex: "",
+  sizePlot: null,
+  purposeLand: [],
+  energy: [],
+  water: [],
+  gas: [],
+  mobileCoverage: null,
+  discountOrSpecialPromotion: "",
+  buildings: null,
+  apartments: null,
+  numberParkings: null,
+  numberBlocks: null,
+  deliveryDate: "",
+  stage: null,
+  saleStatus: null,
+  priceFrom: null,
+  priceTo: null,
+  rentalPrice: null,
+  priceCondition: [],
+  availableList: [],
+  developerDetails: {
+    companyDeveloper: "",
+    contactPerson: "",
+    phone: "",
+    addressCompany: "",
+    owner: "",
+  },
+  sold: null,
+  featuresIds: [],
+  features: [],
+  partnerCommission: null,
+  typeCommission: [],
+  hoaFees: null,
+  taxAmount: null,
+  listingAgreement: [],
+  showingRequirements: [],
+  listingTerms: [],
+  buyerIncentive: [],
+  description: "",
+  video: "",
+  virtualTour: "",
+  pictures: [],
+  documentation: [],
+  energyRatingConsumption: "",
+  energyRatingEmissions: "",
+  authorCompany: "",
+  userId: "",
+  date: "",
+  status: "",
   createdAt: "",
   updatedAt: "",
 });
@@ -73,7 +87,7 @@ const saveDataCustomer = (customer: CreateCustomer) => {
 };
 
 const getCustomer = async () => {
-  const { status, document } = await customersStore.getCustomerById(customerId);
+  const { status, document } = await realEstateStore.getDocumentById(id);
 
   if (status === 1) {
     saveDataCustomer(document as CreateCustomer);
@@ -84,11 +98,11 @@ getCustomer();
 
 <template>
   <div>
-    <CustomerDetails
+    <RealEstateDetails
       :payloadInputs="inputs"
-      :customerId="customerId"
+      :realEstateId="id"
       :type="'Update'"
-    ></CustomerDetails>
+    ></RealEstateDetails>
   </div>
 </template>
 

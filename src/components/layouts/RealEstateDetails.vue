@@ -3,6 +3,7 @@ import vueSelect from "@/components/plugins/VueSelect.vue";
 import datepicker from "@/components/plugins/Datepicker.vue";
 import quillEditor from "@/components/plugins/QuillEditor.vue";
 import InputFiles from "@/components/ui/InputFiles.vue";
+import tagsInput from "@/components/plugins/TagsInput.vue";
 
 import { ref, computed } from "vue";
 import { generateUniqueId } from "@/utils";
@@ -174,13 +175,13 @@ const actionPage = async () => {
     response = await realEstateStore.createDocument(i);
   }
 
-  // if (props.type === "Update") {
-  //   inputs.value.updatedAt = new Date().toDateString();
-  //   response = await customersStore.updateCustomer(
-  //     inputs.value,
-  //     props.customerId,
-  //   );
-  // }
+  if (props.type === "Update") {
+    inputs.value.updatedAt = new Date().toDateString();
+    response = await realEstateStore.updateDocument(
+      inputs.value,
+      props.realEstateId,
+    );
+  }
 
   if (response.status === 0) {
     error.value = "The action is unsuccessful!";
@@ -240,6 +241,30 @@ const removeFeature = (index: number) => {
   inputs.value.features = inputs.value.features?.filter(
     (_el, ind) => ind !== index
   );
+};
+
+const onChangeTypeCommission = (newProperties: { text: string }[]) => {
+  inputs.value.typeCommission = newProperties.map((el) => el.text);
+};
+
+const onChangePriceCondition = (newProperties: { text: string }[]) => {
+  inputs.value.priceCondition = newProperties.map((el) => el.text);
+};
+
+const onChangeListingAgreement = (newProperties: { text: string }[]) => {
+  inputs.value.listingAgreement = newProperties.map((el) => el.text);
+};
+
+const onChangeShowingRequirements = (newProperties: { text: string }[]) => {
+  inputs.value.showingRequirements = newProperties.map((el) => el.text);
+};
+
+const onChangeListingTerms = (newProperties: { text: string }[]) => {
+  inputs.value.listingTerms = newProperties.map((el) => el.text);
+};
+
+const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
+  inputs.value.buyerIncentive = newProperties.map((el) => el.text);
 };
 </script>
 
@@ -632,6 +657,7 @@ const removeFeature = (index: number) => {
                     <vue-select
                       v-model="inputs.energy"
                       :options="appConstantsStore.statusFirst"
+                      multiple
                       placeholder="Select an option"
                     >
                     </vue-select>
@@ -642,6 +668,7 @@ const removeFeature = (index: number) => {
                     <vue-select
                       v-model="inputs.water"
                       :options="appConstantsStore.statusSecond"
+                      multiple
                       placeholder="Select an option"
                     >
                     </vue-select>
@@ -651,6 +678,7 @@ const removeFeature = (index: number) => {
                     <vue-select
                       v-model="inputs.gas"
                       :options="appConstantsStore.statusThird"
+                      multiple
                       placeholder="Select an option"
                     >
                     </vue-select>
@@ -847,11 +875,10 @@ const removeFeature = (index: number) => {
 
                   <div class="mb-3 col-md-6">
                     <label class="form-label">Price condition </label>
-                    <input
-                      v-model="inputs.priceCondition"
-                      type="number"
-                      class="form-control"
-                      placeholder="Price condition"
+                    <tags-input
+                      @tags-changed="onChangePriceCondition"
+                      :tags="inputs.priceCondition"
+                      :autocomplete-items="[]"
                     />
                   </div>
                 </div>
@@ -1244,12 +1271,11 @@ const removeFeature = (index: number) => {
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label">Type comision </label>
-                    <input
-                      v-model="inputs.typeCommission"
-                      type="text"
-                      class="form-control"
-                      placeholder="Type comision"
+                    <label class="form-label">Type commission </label>
+                    <tags-input
+                      @tags-changed="onChangeTypeCommission"
+                      :tags="inputs.typeCommission"
+                      :autocomplete-items="[]"
                     />
                   </div>
 
@@ -1289,39 +1315,34 @@ const removeFeature = (index: number) => {
                 <div class="row">
                   <div class="mb-3 col-md-6">
                     <label class="form-label">Listing agremedemt </label>
-                    <input
-                      v-model="inputs.listingAgreement"
-                      type="text"
-                      class="form-control"
-                      placeholder="Listing agremedemt"
+                    <tags-input
+                      @tags-changed="onChangeListingAgreement"
+                      :tags="inputs.listingAgreement"
+                      :autocomplete-items="[]"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
                     <label class="form-label"> Showing requirements</label>
-                    <input
-                      v-model="inputs.showingRequirements"
-                      type="text"
-                      class="form-control"
-                      placeholder=" Showing requirements"
+                    <tags-input
+                      @tags-changed="onChangeShowingRequirements"
+                      :tags="inputs.showingRequirements"
+                      :autocomplete-items="[]"
                     />
                   </div>
-
                   <div class="mb-3 col-md-6">
                     <label class="form-label"> Listing terms</label>
-                    <input
-                      v-model="inputs.listingTerms"
-                      type="text"
-                      class="form-control"
-                      placeholder="Listing terms"
+                    <tags-input
+                      @tags-changed="onChangeListingTerms"
+                      :tags="inputs.listingTerms"
+                      :autocomplete-items="[]"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
                     <label class="form-label"> Buyer incentive</label>
-                    <input
-                      v-model="inputs.buyerIncentive"
-                      type="text"
-                      class="form-control"
-                      placeholder="Buyer incentive"
+                    <tags-input
+                      @tags-changed="onChangeBuyerIncentive"
+                      :tags="inputs.buyerIncentive"
+                      :autocomplete-items="[]"
                     />
                   </div>
                 </div>

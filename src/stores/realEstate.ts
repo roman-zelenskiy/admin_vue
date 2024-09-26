@@ -3,11 +3,12 @@ import {
   realEstateCollection,
   uploadImage,
   deleteFileFromStorage,
+  db,
 } from "../../firebase.config";
 import {
+  doc,
   addDoc,
   deleteDoc,
-  doc,
   getDoc,
   QuerySnapshot,
   updateDoc,
@@ -67,7 +68,6 @@ export const useRealEstateStore = defineStore("realEstate", () => {
       filterKey: string;
     }
   ): Promise<{ documents: RealEstate[]; totalPages: number }> => {
-    ////
     try {
       const { documents, totalPages } = await getDocumentsByFilters<RealEstate>(
         realEstateCollection,
@@ -75,7 +75,38 @@ export const useRealEstateStore = defineStore("realEstate", () => {
         currentPagePayload,
         filter
       );
-      return { documents: documents, totalPages };
+
+      const documentsWithUsers = await Promise.all(
+        documents.map(async (realEstateDoc) => {
+          try {
+            if (!realEstateDoc.userId) {
+              throw new Error("User ID is missing");
+            }
+            const userDocRef = doc(db, "customers", realEstateDoc.userId);
+            const userDocSnapshot = await getDoc(userDocRef);
+            const userData = userDocSnapshot.exists()
+              ? userDocSnapshot.data()
+              : null;
+
+            return {
+              ...realEstateDoc,
+              user: userData,
+            };
+          } catch (error) {
+            console.error(
+              "Error fetching user data for document: ",
+              realEstateDoc.id,
+              error
+            );
+            return {
+              ...realEstateDoc,
+              user: null,
+            };
+          }
+        })
+      );
+
+      return { documents: documentsWithUsers, totalPages };
     } catch (error) {
       console.error("Error fetching documents: ", error);
       return { documents: [], totalPages: 0 };
@@ -87,7 +118,7 @@ export const useRealEstateStore = defineStore("realEstate", () => {
       const docRef = doc(realEstateCollection, documentId);
       const document = await getDoc(docRef);
       if (document.exists()) {
-        const data = document.data() as RealEstate
+        const data = document.data() as RealEstate;
 
         for (const picture of data.pictures) {
           if (picture) {
@@ -109,7 +140,7 @@ export const useRealEstateStore = defineStore("realEstate", () => {
     }
   };
 
-  const getCustomerById = async (id: Customer["id"]) => {
+  const getDocumentById = async (id: Customer["id"]) => {
     ///
     try {
       const docRef = doc(realEstateCollection, id);
@@ -126,32 +157,34 @@ export const useRealEstateStore = defineStore("realEstate", () => {
     }
   };
 
-  const updateCustomer = async (
-    documentInputs: CreateCustomer,
-    id: Customer["id"]
+  const updateDocument = async (
+    documentInputs: CreateRealEstate,
+    id: RealEstate["id"]
   ) => {
-    ///
     const inputs = documentInputs;
-    // if (inputsCustomer.photo && inputsCustomer.photo instanceof File) {
-    //   await uploadImage(
-    //     inputsCustomer.photo,
-    //     `user_photos/${generateUniqueId()}`
-    //   ).then((res) => {
-    //     inputsCustomer.photo = res as string;
-    //   });
-    // // }
+    inputs.documentation = await Promise.all(
+      inputs.documentation.map(async (el) => {
+        if (el && !!el?.file) {
+          el = (await uploadImage(
+            el?.file,
+            `real_estate_documentation/${generateUniqueId()}`
+          )) as string;
+        }
+        return el;
+      })
+    );
 
-    // inputs.experience = await Promise.all(
-    //   inputs.experience.map(async (el) => {
-    //     if (el.logo && el.logo instanceof File) {
-    //       el.logo = (await uploadImage(
-    //         el.logo,
-    //         `experience_logos/${generateUniqueId()}`
-    //       )) as string;
-    //     }
-    //     return el;
-    //   })
-    // );
+    inputs.pictures = await Promise.all(
+      inputs.pictures.map(async (el) => {
+        if (el && !!el?.file) {
+          el = (await uploadImage(
+            el?.file,
+            `real_estate_pictures/${generateUniqueId()}`
+          )) as string;
+        }
+        return el;
+      })
+    );
     try {
       const docRef = doc(realEstateCollection, id);
       await updateDoc(docRef, { ...inputs });
@@ -166,7 +199,7 @@ export const useRealEstateStore = defineStore("realEstate", () => {
     createDocument,
     getItemsByFilters,
     deleteDocument,
-    getCustomerById,
-    updateCustomer,
+    getDocumentById,
+    updateDocument,
   };
 });

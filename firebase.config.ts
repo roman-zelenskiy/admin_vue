@@ -37,6 +37,7 @@ export const categoriesCollection = collection(db, "user-categories");
 export const usersCollection = collection(db, "customers");
 export const realEstateCollection = collection(db, "real-estate");
 export const featuresCollection = collection(db, "features");
+export const skillsCollection = collection(db, "skills");
 
 export const storage = getStorage(firebaseApp);
 

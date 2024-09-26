@@ -1,5 +1,5 @@
 declare interface RealEstate {
-  id: string | null;
+  id: string;
   address: string | null;
   locationLat: string | null;
   locationIng: string | null;
@@ -84,9 +84,9 @@ declare interface RealEstate {
   residentialComplex: string | null;
   sizePlot: number | null;
   purposeLand: Array<"Urban" | "Development" | "Undeveloped"> | null;
-  energy: "Connected" | "Disconnected" | "Yes" | null;
-  water: "Connected" | "Disconnected" | "Debts" | null;
-  gas: "Connected" | "Disconnected" | "No" | null;
+  energy: Array<"Connected" | "Disconnected" | "Yes">;
+  water: Array<"Connected" | "Disconnected" | "Debts">;
+  gas: Array<"Connected" | "Disconnected" | "Debts">;
   mobileCoverage:
     | "Full coverage"
     | "Stable coverage"
@@ -105,7 +105,7 @@ declare interface RealEstate {
   priceFrom: number | null;
   priceTo: number | null;
   rentalPrice: number | null;
-  priceCondition: number | null;
+  priceCondition: string[];
 
   availableList: {
     id: string;
@@ -136,14 +136,14 @@ declare interface RealEstate {
   }[];
 
   partnerCommission: number | null;
-  typeCommission: string | null;
+  typeCommission: string[] | null;
   hoaFees: number | null;
   taxAmount: number | null;
 
-  listingAgreement: string | null;
-  showingRequirements: string | null;
-  listingTerms: string | null;
-  buyerIncentive: string | null;
+  listingAgreement: string[];
+  showingRequirements: string[];
+  listingTerms: string[];
+  buyerIncentive: string[];
 
   description: string | null;
   video: string | null;

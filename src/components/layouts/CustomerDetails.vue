@@ -11,6 +11,7 @@ import { useCountriesStore } from "@/stores/countries.ts";
 import { useCategoriesStore } from "@/stores/categories.ts";
 import { useAppConstantsStore } from "@/stores/app-constants.ts";
 import { useCustomersStore } from "@/stores/customers.ts";
+import { useSkillsStore } from "@/stores/skills.ts";
 
 type Props =
   | {
@@ -29,6 +30,8 @@ const countriesStore = useCountriesStore();
 const categoriesStore = useCategoriesStore();
 const customersStore = useCustomersStore();
 const appConstantsStore = useAppConstantsStore();
+const skillsStore = useSkillsStore();
+
 const emits = defineEmits(["update:modelValue"]);
 
 const visibilityOptions = appConstantsStore.visibilityOptions;
@@ -38,6 +41,7 @@ const countries = computed(() => [
 ]);
 const languages = computed(() => countriesStore.languagesList);
 const { categories } = categoriesStore.getAllCategories();
+const { documents: skills } = skillsStore.getAllDocuments();
 
 const error = ref("");
 const message = ref("");
@@ -62,7 +66,6 @@ const changeDateExperience = computed({
     previewExperience.value.end = arrayDate[1] || "";
   },
 });
-
 
 const inputs = computed({
   get: () => props.payloadInputs,
@@ -202,6 +205,18 @@ const removeSocial = (
   index: number
 ) => {
   inputs.value[type] = inputs.value[type].filter((el, ind) => ind !== index);
+};
+
+const addSkills = () => {
+  inputs.value.skills?.push({
+    id: "",
+    properties: [],
+  });
+};
+const removeSkills = (index: number) => {
+  inputs.value.skills = inputs.value.skills?.filter(
+    (_el, ind) => ind !== index
+  );
 };
 </script>
 
@@ -719,6 +734,72 @@ const removeSocial = (
             </card-body>
           </card>
         </div>
+
+        <card class="mb-4">
+          <card-header
+            class="d-flex align-items-center bg-inverse bg-opacity-10 fw-400"
+          >
+            Skills
+          </card-header>
+          <card-body>
+            <div class="row">
+              <div>
+                <div class="row">
+                  <div
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <button
+                      @click="addSkills"
+                      type="button"
+                      class="btn btn-theme fileinput-button me-2 mb-1"
+                    >
+                      <i class="fa fa-fw fa-plus"></i>
+                      <span>Add feature...</span>
+                    </button>
+                  </div>
+                  <div
+                    v-for="(item, index) in inputs.skills"
+                    :key="index"
+                    class="row mb-3 gx-3"
+                  >
+                    <div class="col">
+                      <select v-model="item.id" class="form-select">
+                        <option selected value="">Select a category</option>
+                        <option
+                          v-for="skill in skills"
+                          :key="skill.id"
+                          :value="skill.id"
+                        >
+                          {{ skill.title }}
+                        </option>
+                      </select>
+                    </div>
+                    <div class="col">
+                      <vue-select
+                        v-model="item.properties"
+                        :options="
+                          skills.find((el) => el.id === item.id)?.properties
+                        "
+                        placeholder="Select an options"
+                        multiple
+                      ></vue-select>
+                    </div>
+                    <div class="col-1">
+                      <button
+                        @click="removeSkills(index)"
+                        type="button"
+                        href="#"
+                        class="btn btn-default d-block"
+                      >
+                        <i class="fa fa-xmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </card-body>
+        </card>
 
         <card class="mb-4">
           <card-header

@@ -39,7 +39,7 @@ const checkInitialFiles = async () => {
       if (typeof file === "string") {
         imagePreviewStatus.value[index] = await isImageUrl(file);
       } else {
-        imagePreviewStatus.value[index] = file.isImage; // Если это FileData, используем isImage
+        imagePreviewStatus.value[index] = file.isImage;
       }
     })
   );
@@ -126,7 +126,7 @@ const removeFile = (index: number) => {
             </div>
 
             <div v-else>
-              <div v-if="imagePreviewStatus[index] && showPreview">
+              <div v-if="showPreview">
                 <img :src="file" alt="Image preview" class="file-thumbnail" />
               </div>
               <div v-else class="file-icon">
@@ -135,6 +135,7 @@ const removeFile = (index: number) => {
             </div>
 
             <button
+            type="submit"
               @click="removeFile(index)"
               class="btn btn-remove btn-sm btn-danger"
             >

@@ -169,16 +169,14 @@ export const useAppConstantsStore = defineStore("constants", () => {
     "Undeveloped",
   ];
 
-  const statusFirst: Array<"Connected" | "Disconted" | "Yes"> = [
-    "Connected",
-    "Disconted",
-    "Yes",
-  ];
-
   const statusSecond: Array<"Connected" | "Disconted" | "Debts"> = [
     "Connected",
     "Disconted",
     "Debts",
+  ];
+
+  const statusFirst: Array<"Connected" | "Disconted" | "Debts"> = [
+    ...statusSecond,
   ];
 
   const statusThird: Array<"Connected" | "Disconted" | "No"> = [
@@ -242,6 +240,6 @@ export const useAppConstantsStore = defineStore("constants", () => {
     saleStatus,
     sold,
     coverageOptions,
-    statusListing
+    statusListing,
   };
 });

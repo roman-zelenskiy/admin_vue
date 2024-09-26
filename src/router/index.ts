@@ -47,8 +47,24 @@ const router = createRouter({
           component: () => import("../pages/features/UpdateFeatures.vue"),
         },
         {
+          path: "/skills",
+          component: () => import("../pages/skills/List.vue"),
+        },
+        {
+          path: "/skills-create",
+          component: () => import("../pages/skills/Create.vue"),
+        },
+        {
+          path: "/skills-update/:id",
+          component: () => import("../pages/skills/Update.vue"),
+        },
+        {
           path: "/real-estate-create",
           component: () => import("../pages/real_estate/CreateRealEstate.vue"),
+        },
+        {
+          path: "/real-estate-update/:id",
+          component: () => import("../pages/real_estate/UpdateRealEstate.vue"),
         },
         {
           path: "/customer-create",
