@@ -161,7 +161,7 @@ getCategories();
                 <td>
                   <div class="d-flex align-items-center">
                     <div>
-                      <RouterLink :to="/feature-update/ + category.id">{{
+                      <RouterLink :to="/skills-update/ + category.id">{{
                         category.title
                       }}</RouterLink>
                     </div>

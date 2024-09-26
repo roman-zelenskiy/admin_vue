@@ -5,7 +5,6 @@ import { useCategoriesStore } from "@/stores/categories.ts";
 
 import Pagination from "@/components/ui/Pagination.vue";
 import ModalConfirmation from "@/components/ui/ModalConfirmation.vue";
-import { formatDate } from "@/utils";
 
 const customersStore = useCustomersStore();
 const categoriesStore = useCategoriesStore();
