@@ -122,4 +122,10 @@ declare interface CreateCustomer extends Omit<Customer, "id"> {
   }[];
 }
 
-declare type CustomersFilters = "id" | "name" | "createdAt" | "company" | "";
+declare type CustomersFilters =
+  | "id"
+  | "name"
+  | "createdAt"
+  | "company"
+  | "categoryId"
+  | "";
