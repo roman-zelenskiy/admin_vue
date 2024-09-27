@@ -6,9 +6,7 @@ import { useCategoriesStore } from "@/stores/categories.ts";
 import vueSelect from "@/components/plugins/VueSelect.vue";
 import Pagination from "@/components/ui/Pagination.vue";
 import ModalConfirmation from "@/components/ui/ModalConfirmation.vue";
-// import { db, usersCollection } from "../../../firebase.config";
 
-// import { getDocs, setDoc, deleteDoc, doc } from "firebase/firestore";
 
 const customersStore = useCustomersStore();
 const categoriesStore = useCategoriesStore();
@@ -103,70 +101,7 @@ watch(
 
 getDocuments();
 
-// const collectionRef = usersCollection;
-// // Шаг 1: Поиск документов с одинаковым name
-// const findDuplicates = async () => {
-//   const snapshot = await getDocs(collectionRef);
-//   const docMap = new Map();
 
-//   snapshot.forEach((doc) => {
-//     const data = doc.data();
-//     const name = data.name; // Поле, по которому проверяем одинаковость
-
-//     if (docMap.has(name)) {
-//       docMap.get(name).push({ id: doc.id, data });
-//     } else {
-//       docMap.set(name, [{ id: doc.id, data }]);
-//     }
-//   });
-
-//   return docMap;
-// };
-
-// // Шаг 2: Объединение данных и обновление одного документа
-// const mergeDocuments = async () => {
-//   const duplicatesMap = await findDuplicates();
-
-//   for (const [name, docs] of duplicatesMap) {
-//     console.log(`Обрабатываем дубликаты для имени "${name}":`, docs); // Логирование дубликатов
-
-//     if (docs.length > 1) {
-//       // Объединяем данные документов
-//       const mergedData = { ...docs[0].data }; // Начинаем с первого документа
-//       for (let i = 1; i < docs.length; i++) {
-//         const currentData = docs[i].data;
-
-//         // Объединение массивов (если есть массивы)
-//         if (
-//           Array.isArray(mergedData.items) &&
-//           Array.isArray(currentData.items)
-//         ) {
-//           mergedData.items = [
-//             ...new Set([...mergedData.items, ...currentData.items]),
-//           ];
-//         }
-
-//         // Суммирование значений (если есть поле amount)
-//         if (mergedData.amount && currentData.amount) {
-//           mergedData.amount += currentData.amount;
-//         }
-//       }
-
-//       // Обновляем один документ и удаляем остальные
-//       const mainDocId = docs[0].id;
-//       await setDoc(doc(db, "customers", mainDocId), mergedData);
-
-//       // Удаляем остальные документы
-//       for (let i = 1; i < docs.length; i++) {
-//         console.log(`Удаляем документ с ID ${docs[i].id}`); // Логирование удаления
-//         await deleteDoc(doc(db, "customers", docs[i].id));
-//       }
-
-//       console.log(`Документы для name "${name}" объединены.`);
-//     }
-//   }
-// };
-// mergeDocuments()
 </script>
 
 <template>

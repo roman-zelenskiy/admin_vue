@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CustomerDetails from "@/components/layouts/CustomerDetails.vue";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 const inputs = ref<CreateCustomer>({
   name: "",
