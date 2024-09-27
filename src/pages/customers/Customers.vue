@@ -7,7 +7,6 @@ import vueSelect from "@/components/plugins/VueSelect.vue";
 import Pagination from "@/components/ui/Pagination.vue";
 import ModalConfirmation from "@/components/ui/ModalConfirmation.vue";
 
-
 const customersStore = useCustomersStore();
 const categoriesStore = useCategoriesStore();
 
@@ -100,8 +99,6 @@ watch(
 );
 
 getDocuments();
-
-
 </script>
 
 <template>
@@ -174,17 +171,21 @@ getDocuments();
             </div>
           </div>
         </div>
-        <vue-select
-          class="mb-4"
-          :style="'max-width: 300px'"
-          v-model="currentFilterId"
-          :options="categoriesOptions"
-          :label="'title'"
-          @option:selected="onInputFilterCategory"
-          :reduce="(option: Customer) => option.id"
-          placeholder="Select an option"
-        >
-        </vue-select>
+        <div class="mb-3">
+          <label class="form-label">Category </label>
+          <vue-select
+            class="mb-4"
+            :style="'max-width: 300px'"
+            v-model="currentFilterId"
+            :options="categoriesOptions"
+            :label="'title'"
+            @option:selected="onInputFilterCategory"
+            :reduce="(option: Customer) => option.id"
+            placeholder="Select an option"
+          >
+          </vue-select>
+        </div>
+
         <!-- END input-group -->
 
         <!-- BEGIN table -->
