@@ -70,6 +70,8 @@ const inputs = ref<CreateRealEstate>({
   status: "",
   createdAt: "",
   updatedAt: "",
+  quantityBathrooms: null,
+    quantityBedrooms: null,
 });
 
 watch(

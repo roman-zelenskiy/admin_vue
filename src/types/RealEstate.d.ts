@@ -159,7 +159,8 @@ declare interface RealEstate {
   user?: Customer | null;
   date: string | null;
   status: string | null;
-
+  quantityBathrooms: null | number;
+  quantityBedrooms: null | number;
   createdAt: string | null;
   updatedAt: string | null;
 }

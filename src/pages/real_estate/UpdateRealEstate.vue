@@ -74,6 +74,8 @@ const inputs = ref<CreateRealEstate>({
   userId: "",
   date: "",
   status: "",
+  quantityBathrooms: null,
+  quantityBedrooms: null,
   createdAt: "",
   updatedAt: "",
 });

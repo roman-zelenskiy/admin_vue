@@ -143,20 +143,20 @@ const categoriesOptions = computed(() => {
 });
 
 const validation = () => {
-  if (inputs.value.pictures?.length === 0) {
-    error.value = "There must be a pictures!";
-    return false;
-  }
+  // if (inputs.value.pictures?.length === 0) {
+  //   error.value = "There must be a pictures!";
+  //   return false;
+  // }
 
-  if (inputs.value.documentation?.length === 0) {
-    error.value = "There must be a documentation!";
-    return false;
-  }
+  // if (inputs.value.documentation?.length === 0) {
+  //   error.value = "There must be a documentation!";
+  //   return false;
+  // }
 
-  if (inputs.value.category?.length === 0) {
-    error.value = "There must be a Category!";
-    return false;
-  }
+  // if (inputs.value.category?.length === 0) {
+  //   error.value = "There must be a Category!";
+  //   return false;
+  // }
 
   return true;
 };
@@ -179,7 +179,7 @@ const actionPage = async () => {
     inputs.value.updatedAt = new Date().toDateString();
     response = await realEstateStore.updateDocument(
       inputs.value,
-      props.realEstateId,
+      props.realEstateId
     );
   }
 
@@ -295,39 +295,30 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Address <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Address </label>
                     <input
                       v-model="inputs.address"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Address"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Location lat <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Location lat </label>
                     <input
                       v-model="inputs.locationLat"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Location lat"
                     />
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Location ing <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Location ing </label>
                     <input
                       v-model="inputs.locationIng"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Location ing"
                     />
                   </div>
@@ -347,26 +338,20 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Street <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Street </label>
                     <input
                       v-model="inputs.street"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Street"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Number <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Number</label>
                     <input
                       v-model="inputs.number"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Number"
                     />
                   </div>
@@ -383,38 +368,32 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Door <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Door </label>
                     <input
                       v-model="inputs.door"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Door"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Zip Code <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Zip Code </label>
                     <input
                       v-model="inputs.zipCode"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Zip Code"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
                     <label class="form-label"
-                      >City <span class="text-danger">*</span></label
-                    >
+                      >City <span class="text-danger">*</span>
+                    </label>
                     <input
                       v-model="inputs.city"
                       type="text"
-                      class="form-control"
                       required
+                      class="form-control"
                       placeholder="City"
                     />
                   </div>
@@ -447,28 +426,40 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
                   <div class="mb-3 col-md-6">
                     <label class="form-label"
-                      >Market <span class="text-danger">*</span></label
+                      >Bathrooms <span class="text-danger">*</span></label
                     >
+                    <input
+                      v-model="inputs.quantityBathrooms"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Reference"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label"
+                      >Bedrooms <span class="text-danger">*</span></label
+                    >
+                    <input
+                      v-model="inputs.quantityBedrooms"
+                      type="number"
+                      class="form-control"
+                      required
+                      placeholder="Reference"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-6">
+                    <label class="form-label">Market </label>
                     <vue-select
                       v-model="inputs.market"
                       :options="marketOptions"
                       placeholder="Select an option"
                     >
-                      <template #search-template="{ attributes, events }">
-                        <input
-                          class="vs__search form-control"
-                          :required="!inputs.market"
-                          v-bind="attributes"
-                          v-on="events"
-                        />
-                      </template>
                     </vue-select>
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Clasification <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Clasification  <span class="text-danger">*</span> </label>
                     <vue-select
                       v-model="inputs.classification"
                       :options="appConstantsStore.classification"
@@ -556,23 +547,13 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
 
                   <div class="mb-3 col-md-6" v-if="inputs.typeOfProperty">
-                    <label class="form-label"
-                      >Category <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Category </label>
                     <vue-select
                       v-model="inputs.category"
                       :options="categoriesOptions"
                       placeholder="Select an option"
                       multiple
                     >
-                      <template #search-template="{ attributes, events }">
-                        <input
-                          class="vs__search form-control"
-                          :required="!inputs.category"
-                          v-bind="attributes"
-                          v-on="events"
-                        />
-                      </template>
                     </vue-select>
                   </div>
                 </div>
@@ -591,19 +572,24 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label">Year of construction </label>
+                    <label class="form-label"
+                      >Year of construction <span class="text-danger">*</span>
+                    </label>
                     <input
                       v-model="inputs.yearOfConstruction"
                       type="number"
+                      required
                       class="form-control"
                       placeholder="Year of construction"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
                     <label class="form-label">Total floor</label>
+                    <span class="text-danger">*</span>
                     <input
                       v-model="inputs.totalFloor"
                       type="number"
+                      required
                       class="form-control"
                       placeholder="Total floor"
                     />
@@ -634,10 +620,13 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label">Size plot </label>
+                    <label class="form-label"
+                      >Size plot <span class="text-danger">*</span>
+                    </label>
                     <input
                       v-model="inputs.sizePlot"
                       type="number"
+                      required
                       class="form-control"
                       placeholder="Size plot"
                     />
@@ -711,22 +700,17 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   <div class="mb-3 col-md-6">
                     <label class="form-label"
                       >Discount or special promotion
-                      <span class="text-danger">*</span>
                     </label>
                     <input
                       v-model="inputs.discountOrSpecialPromotion"
                       type="text"
-                      required
                       class="form-control"
                       placeholder="Discount or special promotion"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Buildings <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Buildings </label>
                     <input
-                      required
                       v-model="inputs.buildings"
                       type="number"
                       class="form-control"
@@ -735,11 +719,8 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Apartaments <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Apartaments </label>
                     <input
-                      required
                       v-model="inputs.apartments"
                       type="number"
                       class="form-control"
@@ -748,11 +729,8 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Nº Parkings <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Nº Parkings </label>
                     <input
-                      required
                       v-model="inputs.numberParkings"
                       type="number"
                       class="form-control"
@@ -761,11 +739,8 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Nº blocks <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Nº blocks </label>
                     <input
-                      required
                       v-model="inputs.numberBlocks"
                       type="number"
                       class="form-control"
@@ -774,33 +749,20 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Delivery data <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Delivery data </label>
                     <datepicker
                       v-model="inputs.deliveryDate"
                       :enable-time-picker="false"
-                      required
                     />
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Stage <span class="text-danger">*</span>
-                    </label>
+                    <label class="form-label">Stage </label>
                     <vue-select
                       v-model="inputs.stage"
                       :options="appConstantsStore.stage"
                       placeholder="Select an option"
                     >
-                      <template #search-template="{ attributes, events }">
-                        <input
-                          class="vs__search form-control"
-                          :required="!inputs.stage"
-                          v-bind="attributes"
-                          v-on="events"
-                        />
-                      </template>
                     </vue-select>
                   </div>
 
@@ -839,26 +801,22 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Price from <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Price from </label>
                     <input
                       v-model="inputs.priceFrom"
                       type="number"
                       class="form-control"
-                      required
+                      
                       placeholder="Price from"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Price to <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Price to </label>
                     <input
                       v-model="inputs.priceTo"
                       type="number"
                       class="form-control"
-                      required
+                      
                       placeholder="Price to"
                     />
                   </div>
@@ -1097,74 +1055,50 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Company developer
-                      <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Company developer </label>
                     <input
                       v-model="inputs.developerDetails.companyDeveloper"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Company developer"
                     />
                   </div>
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Contact person
-
-                      <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Contact person </label>
                     <input
                       v-model="inputs.developerDetails.contactPerson"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Contact person"
                     />
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Phone
-
-                      <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Phone </label>
                     <input
                       v-model="inputs.developerDetails.phone"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Phone"
                     />
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Adress company
-
-                      <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Adress company </label>
                     <input
                       v-model="inputs.developerDetails.addressCompany"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Adress company"
                     />
                   </div>
 
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Owner
-
-                      <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Owner </label>
                     <input
                       v-model="inputs.developerDetails.owner"
                       type="text"
                       class="form-control"
-                      required
                       placeholder="Owner"
                     />
                   </div>
@@ -1259,14 +1193,11 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
               <div>
                 <div class="row">
                   <div class="mb-3 col-md-6">
-                    <label class="form-label"
-                      >Partner <span class="text-danger">*</span></label
-                    >
+                    <label class="form-label">Partner </label>
                     <input
                       v-model="inputs.partnerCommission"
                       type="number"
                       class="form-control"
-                      required
                       placeholder="Partner"
                     />
                   </div>
@@ -1395,12 +1326,10 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                     <div class="mb-3 col-md-6">
                       <label class="form-label">
                         Energy rating consumption
-                        <span class="text-danger">*</span>
                       </label>
                       <input
                         v-model="inputs.energyRatingConsumption"
                         type="text"
-                        required
                         class="form-control"
                         placeholder="Energy rating consumption"
                       />
@@ -1418,23 +1347,18 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                     </div>
 
                     <div class="mb-3 col-md-6">
-                      <label class="form-label">
-                        Author/Company
-                        <span class="text-danger">*</span>
-                      </label>
+                      <label class="form-label"> Author/Company </label>
                       <input
                         v-model="inputs.authorCompany"
                         type="text"
-                        required
+                        
                         class="form-control"
                         placeholder="Author/Company"
                       />
                     </div>
 
                     <div class="col-md-6 mb-3">
-                      <label class="form-label"
-                        >User <span class="text-danger">*</span>
-                      </label>
+                      <label class="form-label">User </label>
                       <vue-select
                         v-model="inputs.userId"
                         :options="customersOptions"
@@ -1442,25 +1366,14 @@ const onChangeBuyerIncentive = (newProperties: { text: string }[]) => {
                         :reduce="(option: Customer) => option.id"
                         placeholder="Select an option"
                       >
-                        <template #search-template="{ attributes, events }">
-                          <input
-                            class="vs__search form-control"
-                            :required="!inputs.userId"
-                            v-bind="attributes"
-                            v-on="events"
-                          />
-                        </template>
                       </vue-select>
                     </div>
 
                     <div class="mb-3 col-md-6">
-                      <label class="form-label"
-                        >Date <span class="text-danger">*</span>
-                      </label>
+                      <label class="form-label">Date </label>
                       <datepicker
                         v-model="inputs.date"
                         :enable-time-picker="false"
-                        required
                       />
                     </div>
 
