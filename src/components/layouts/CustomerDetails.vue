@@ -107,22 +107,22 @@ const showExperience = computed(() => {
 });
 
 const validation = () => {
-  if (inputs.value.phone.length === 0) {
-    error.value = "There must be a phone number!";
-    return false;
-  }
-  if (inputs.value.email.length === 0) {
-    error.value = "There must be a email!";
-    return false;
-  }
-  if (inputs.value.websiteSocial.length === 0) {
-    error.value = "There must be a website!";
-    return false;
-  }
-  if (!inputs.value.aboutUser) {
-    error.value = "There must be a About User field!";
-    return false;
-  }
+  // if (inputs.value.phone.length === 0) {
+  //   error.value = "There must be a phone number!";
+  //   return false;
+  // }
+  // if (inputs.value.email.length === 0) {
+  //   error.value = "There must be a email!";
+  //   return false;
+  // }
+  // if (inputs.value.websiteSocial.length === 0) {
+  //   error.value = "There must be a website!";
+  //   return false;
+  // }
+  // if (!inputs.value.aboutUser) {
+  //   error.value = "There must be a About User field!";
+  //   return false;
+  // }
 
   return true;
 };
@@ -234,7 +234,12 @@ const removeSkills = (index: number) => {
   </div>
 
   <div class="row gx-4">
-    <form action="#" id="form-main-user" @submit.prevent="actionPage">
+    <form
+      action="#"
+      novalidate
+      id="form-main-user"
+      @submit.prevent="actionPage"
+    >
       <div class="">
         <card class="mb-4">
           <card-header
